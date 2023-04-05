@@ -1,0 +1,16 @@
+{
+  "include": [
+    "src"
+  ],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": false,
+    "inlineSourceMap": false,
+    "removeComments": false,
+    "sourceMap": true
+  },
+  "exclude": ["node_modules", "dist", "demo"],
+  "extends": "@dcl/sdk/types/tsconfig.ecs7.json"
+}

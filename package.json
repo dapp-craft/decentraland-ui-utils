@@ -1,0 +1,48 @@
+{
+  "name": "@dcl/ui-scene-utils",
+  "version": "0.0.0-development",
+  "description": "A collection of UI helpers to make it easier to build a Decentraland scene using the SDK.",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "decentralandLibrary": {},
+  "scripts": {
+    "semantic-release": "semantic-release",
+    "build": "rollup -c --environment BUILD:production",
+    "link": "npm link && rollup --watch -c --environment BUILD:production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/decentraland-ui-utils.git"
+  },
+  "keywords": [],
+  "author": "Decentraland",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/decentraland/decentraland-ui-utils/issues"
+  },
+  "homepage": "https://github.com/decentraland/decentraland-ui-utils#readme",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=6.0.0",
+    "yarn": "please use npm"
+  },
+  "devDependencies": {
+    "@dcl/sdk": "next",
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/plugin-typescript": "^11.1.0",
+    "prettier": "^1.19.1",
+    "rollup": "^2.35.1",
+    "rollup-plugin-cleaner": "^1.0.0",
+    "semantic-release": "^16.0.1",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ]
+}
