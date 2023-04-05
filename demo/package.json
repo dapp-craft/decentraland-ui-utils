@@ -23,6 +23,7 @@
     "trailingComma": "none"
   },
   "dependencies": {
+    "@dcl/ui-scene-utils": "file:..",
     "typescript": "^4.4.4"
   }
 }
