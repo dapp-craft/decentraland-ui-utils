@@ -41,11 +41,11 @@ const iconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
  *
  * @param {boolean} [startHidden=true] startHidden starting hidden
  * @param {string} image path to image file
- * @param {number} width image width
- * @param {number} height image height
- * @param {number} [xOffset=-30] offset on X
- * @param {number} [yOffset=50] offset on Y
- * @param {IconSizeType} [size='medium'] icon size
+ * @param {number} [width=128] image width
+ * @param {number} [height=128] image height
+ * @param {number} [xOffset=0] offset on X
+ * @param {number} [yOffset=0] offset on Y
+ * @param {IconSizeType} [size='large'] icon size
  * @param {ImageAtlasData} section cut out a section of the image, as an object specifying atlasWidth, atlasHeight, sourceLeft, sourceTop, sourceWidth and sourceHeight
  *
  */

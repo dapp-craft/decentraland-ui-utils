@@ -25,8 +25,14 @@ const textInitialConfig: Required<TextConfig> = {
 } as const
 
 /**
- * Displays a loading icon in the center of the screen
+ * Prompt text
  * @param {boolean} [startHidden=true] startHidden starting hidden
+ * @param {string | number} [value=''] starting value
+ * @param {number} [xPosition=0] position on X
+ * @param {number} [yPosition=0] position on Y
+ * @param {boolean} [darkTheme=false] prompt color style
+ * @param {Color4} [color=Color4.Black()] text color
+ * @param {number} [size=15] text size
  *
  */
 export class Text extends UIObject {

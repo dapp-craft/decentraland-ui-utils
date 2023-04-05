@@ -33,8 +33,14 @@ const promptInitialConfig: Required<CloseIconConfig> = {
 } as const
 
 /**
- * Displays a loading icon in the center of the screen
+ * Prompt close button
  * @param {boolean} [startHidden=true] startHidden starting hidden
+ * @param {CloseIconStyles} [style=CloseIconStyles.CLOSED] visible variant
+ * @param {number} [width=32] image width
+ * @param {number} [height=32] image height
+ * @param {number} [xPosition=0] position on X
+ * @param {number} [yPosition=0] position on Y
+ * @param {Callback} [onMouseDown=0] click action
  *
  */
 export class CloseIcon extends UIObject {
