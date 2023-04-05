@@ -4,7 +4,7 @@ import { UIObject, UIObjectConfig } from '../UIObject'
 
 import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
 
-import { atlasPathLight, sourcesComponentsCoordinates } from '../../constants/resources'
+import { AtlasTheme, sourcesComponentsCoordinates } from '../../constants/resources'
 
 type LoadingConfig = UIObjectConfig & {
   duration?: number;
@@ -81,7 +81,7 @@ export class Loading extends UIObject {
         uiBackground={{
           textureMode: 'stretch',
           texture: {
-            src: atlasPathLight,
+            src: AtlasTheme.ATLAS_PATH_LIGHT,
           },
           uvs: getImageAtlasMapping(this._section),
         }}

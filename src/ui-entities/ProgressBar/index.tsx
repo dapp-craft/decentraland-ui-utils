@@ -5,7 +5,7 @@ import { UIObject, UIObjectConfig } from '../UIObject'
 
 import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
 
-import { atlasPathLight, sourcesComponentsCoordinates } from '../../constants/resources'
+import { AtlasTheme, sourcesComponentsCoordinates } from '../../constants/resources'
 
 export enum BarStyles {
   ROUNDBLACK = `roundBlack`,
@@ -178,7 +178,7 @@ export class ProgressBar extends UIObject {
           uiBackground={{
             textureMode: 'stretch',
             texture: {
-              src: atlasPathLight,
+              src: AtlasTheme.ATLAS_PATH_LIGHT,
             },
             uvs: getImageAtlasMapping(this._section),
           }}
@@ -197,7 +197,7 @@ export class ProgressBar extends UIObject {
             color: this._color,
             textureMode: 'stretch',
             texture: {
-              src: atlasPathLight,
+              src: AtlasTheme.ATLAS_PATH_LIGHT,
             },
             uvs: getImageAtlasMapping({
               ...sourcesComponentsCoordinates.buttons[this._style.startsWith('round') ? 'roundWhite' : 'squareWhite'],

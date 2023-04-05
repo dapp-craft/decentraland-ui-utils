@@ -1,5 +1,7 @@
-export const atlasPathLight = 'https://decentraland.org/images/ui/light-atlas-v3.png'
-export const atlasPathDark = 'https://decentraland.org/images/ui/dark-atlas-v3.png'
+export enum AtlasTheme {
+  ATLAS_PATH_LIGHT = `https://decentraland.org/images/ui/light-atlas-v3.png`,
+  ATLAS_PATH_DARK = `https://decentraland.org/images/ui/dark-atlas-v3.png`,
+}
 
 export const sourcesComponentsCoordinates = {
   atlasHeight: 1024,

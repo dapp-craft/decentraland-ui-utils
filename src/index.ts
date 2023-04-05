@@ -5,7 +5,7 @@ import { BarStyles, ProgressBar as UIBar } from './ui-entities/ProgressBar'
 import { LargeIcon, MediumIcon, SmallIcon } from './ui-entities/Icon'
 import { Loading as LoadingIcon } from './ui-entities/Loading'
 import { CenterImage } from './ui-entities/CenterImage'
-import { Prompt } from './ui-entities/Prompt'
+import { Prompt as CustomPrompt, PromptStyles } from './ui-entities/Prompt'
 
 // import { engine } from '@dcl/sdk/ecs'
 
@@ -20,9 +20,9 @@ export {
   LargeIcon,
   CenterImage,
   LoadingIcon,
-  Prompt,
+  CustomPrompt,
+  PromptStyles,
 }
-
 
 // let timer: number = 7
 //

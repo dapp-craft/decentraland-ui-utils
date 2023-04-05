@@ -4,7 +4,7 @@ export interface UIObjectInterface {
   /**
    * Returns UiEntity.
    */
-  render(): ReactEcs.JSX.Element;
+  render(key?: string): ReactEcs.JSX.Element;
 
   /**
    * Makes an invisible visible again.
@@ -28,7 +28,7 @@ export abstract class UIObject implements UIObjectInterface {
     this.visible = !startHidden
   }
 
-  abstract render(): ReactEcs.JSX.Element
+  abstract render(key?: string): ReactEcs.JSX.Element
 
   public show(): void {
     this.visible = true

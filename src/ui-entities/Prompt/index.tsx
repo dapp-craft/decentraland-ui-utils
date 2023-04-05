@@ -1,10 +1,15 @@
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import { Callback } from '@dcl/react-ecs/dist/components/listeners/types'
 
 import { UIObject, UIObjectConfig } from '../UIObject'
 
+import { CloseIcon, CloseIconConfig, CloseIconStyles } from './components/CloseIcon'
+import { Text, TextConfig } from './components/Text'
+import { Icon, IconConfig } from '../Icon'
+
 import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
 
-import { atlasPathDark, atlasPathLight, sourcesComponentsCoordinates } from '../../constants/resources'
+import { AtlasTheme, sourcesComponentsCoordinates } from '../../constants/resources'
 
 export enum PromptStyles {
   LIGHT = `light`,
@@ -19,6 +24,7 @@ type PromptConfig = UIObjectConfig & {
   style?: PromptStyles;
   width?: number;
   height?: number;
+  onClose?: Callback;
 }
 
 const promptInitialConfig: Required<PromptConfig> = {
@@ -26,6 +32,8 @@ const promptInitialConfig: Required<PromptConfig> = {
   style: PromptStyles.LIGHT,
   width: 400,
   height: 250,
+  onClose: () => {
+  },
 } as const
 
 /**
@@ -34,26 +42,29 @@ const promptInitialConfig: Required<PromptConfig> = {
  *
  */
 export class Prompt extends UIObject {
-  private readonly _texture: string
+  private _texture: AtlasTheme
   private _section: ImageAtlasData
   private readonly _width: number
   private readonly _height: number
   private readonly _style: PromptStyles
+  private readonly _onClose: Callback
+  private _components: any[]
+  private readonly _closeIconData: CloseIconConfig
 
   constructor(
     {
       startHidden = promptInitialConfig.startHidden,
-      width = promptInitialConfig.width,
-      height = promptInitialConfig.height,
       style = promptInitialConfig.style,
+      width,
+      height,
+      onClose = promptInitialConfig.onClose,
     }: PromptConfig) {
     super({ startHidden })
 
-    this._width = width
-    this._height = height
     this._style = style
+    this._onClose = onClose
 
-    this._texture = atlasPathLight
+    this._texture = AtlasTheme.ATLAS_PATH_LIGHT
 
     this._section = {
       ...sourcesComponentsCoordinates.backgrounds.promptBackground,
@@ -61,7 +72,32 @@ export class Prompt extends UIObject {
       atlasWidth: sourcesComponentsCoordinates.atlasWidth,
     }
 
-    this._setStyle();
+    this._closeIconData = {
+      width: 32,
+      height: 32,
+      style: CloseIconStyles.CLOSED,
+      onMouseDown: this._close,
+    }
+
+    this._setStyle()
+
+    this._width = width ? width : this._section.sourceWidth
+    this._height = height ? height : this._section.sourceHeight
+
+    this._components = [new CloseIcon(this._closeIconData)]
+  }
+
+  public addIcon(config: IconConfig): void {
+    this._components.push(new Icon({
+      ...config,
+      startHidden: false,
+      xOffset: this._width / -2 + (config.width || 128) / 2 + (config.xOffset || 0),
+      yOffset: this._height / 2 + (config.height || 128) / -2 + (config.yOffset || 0),
+    }))
+  }
+
+  public addText(config: Omit<TextConfig, 'darkTheme'>): void {
+    this._components.push(new Text({ ...config, darkTheme: this._texture !== AtlasTheme.ATLAS_PATH_LIGHT }))
   }
 
   public render(): ReactEcs.JSX.Element {
@@ -70,7 +106,7 @@ export class Prompt extends UIObject {
         uiTransform={{
           display: this.visible ? 'flex' : 'none',
           flexDirection: 'column',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           justifyContent: 'center',
           positionType: 'absolute',
           position: { top: '50%', left: '50%' },
@@ -94,10 +130,11 @@ export class Prompt extends UIObject {
             uvs: getImageAtlasMapping(this._section),
           }}
         />
-        {/*<Label*/}
-        {/*  font={defaultFont}*/}
-        {/*  value={String(this._text)}*/}
-        {/*/>*/}
+        {
+          this._components.map((component, idx) => (
+            component.render(`prompt-component-${idx}`)
+          ))
+        }
       </UiEntity>
     )
   }
@@ -110,11 +147,11 @@ export class Prompt extends UIObject {
           atlasHeight: sourcesComponentsCoordinates.atlasHeight,
           atlasWidth: sourcesComponentsCoordinates.atlasWidth,
         }
-        // this.texture = lightTheme
-        // setSection(this.background, resources.backgrounds.promptBackground)
-        // setSection(this.closeIcon, resources.icons.closeD)
-        // this.closeIcon.positionX = width ? width / 2 - 25 : 175
-        // this.closeIcon.positionY = height ? height / 2 - 25 : 145
+
+        this._texture = AtlasTheme.ATLAS_PATH_LIGHT
+
+        this._closeIconData.style = CloseIconStyles.CLOSED
+
         break
       case PromptStyles.DARK:
         this._section = {
@@ -122,12 +159,11 @@ export class Prompt extends UIObject {
           atlasHeight: sourcesComponentsCoordinates.atlasHeight,
           atlasWidth: sourcesComponentsCoordinates.atlasWidth,
         }
-        // this.texture = darkTheme
-        // this.darkTheme = true
-        // setSection(this.background, resources.backgrounds.promptBackground)
-        // setSection(this.closeIcon, resources.icons.closeW)
-        // this.closeIcon.positionX = width ? width / 2 - 25 : 175
-        // this.closeIcon.positionY = height ? height / 2 - 25 : 145
+
+        this._texture = AtlasTheme.ATLAS_PATH_DARK
+
+        this._closeIconData.style = CloseIconStyles.CLOSEW
+
         break
       case PromptStyles.LIGHTLARGE:
         this._section = {
@@ -135,11 +171,11 @@ export class Prompt extends UIObject {
           atlasHeight: sourcesComponentsCoordinates.atlasHeight,
           atlasWidth: sourcesComponentsCoordinates.atlasWidth,
         }
-        // this.texture = lightTheme
-        // setSection(this.background, resources.backgrounds.promptLargeBackground)
-        // setSection(this.closeIcon, resources.icons.closeD)
-        // this.closeIcon.positionX = width ? width / 2 - 25 : 175 + 40
-        // this.closeIcon.positionY = height ? height / 2 - 25 : 145 + 20
+
+        this._texture = AtlasTheme.ATLAS_PATH_LIGHT
+
+        this._closeIconData.style = CloseIconStyles.CLOSED
+
         break
       case PromptStyles.DARKLARGE:
         this._section = {
@@ -147,12 +183,11 @@ export class Prompt extends UIObject {
           atlasHeight: sourcesComponentsCoordinates.atlasHeight,
           atlasWidth: sourcesComponentsCoordinates.atlasWidth,
         }
-        // this.texture = darkTheme
-        // this.darkTheme = true
-        // setSection(this.background, resources.backgrounds.promptLargeBackground)
-        // setSection(this.closeIcon, resources.icons.closeW)
-        // this.closeIcon.positionX = width ? width / 2 - 25 : 175 + 40
-        // this.closeIcon.positionY = height ? height / 2 - 25 : 145 + 20
+
+        this._texture = AtlasTheme.ATLAS_PATH_DARK
+
+        this._closeIconData.style = CloseIconStyles.CLOSEW
+
         break
       case PromptStyles.LIGHTSLANTED:
         this._section = {
@@ -160,11 +195,12 @@ export class Prompt extends UIObject {
           atlasHeight: sourcesComponentsCoordinates.atlasHeight,
           atlasWidth: sourcesComponentsCoordinates.atlasWidth,
         }
-        // this.texture = lightTheme
-        // setSection(this.background, resources.backgrounds.promptSlantedBackground)
-        // setSection(this.closeIcon, resources.icons.closeD)
-        // this.closeIcon.positionX = width ? width / 2 - 25 : 175 + 40
-        // this.closeIcon.positionY = height ? height / 2 - 25 : 100 + 38
+
+        this._texture = AtlasTheme.ATLAS_PATH_LIGHT
+
+        this._closeIconData.style = CloseIconStyles.CLOSED
+        this._closeIconData.xPosition = 15
+
         break
 
       case PromptStyles.DARKSLANTED:
@@ -173,16 +209,19 @@ export class Prompt extends UIObject {
           atlasHeight: sourcesComponentsCoordinates.atlasHeight,
           atlasWidth: sourcesComponentsCoordinates.atlasWidth,
         }
-        // this.texture = darkTheme
-        // this.darkTheme = true
-        // setSection(this.background, resources.backgrounds.promptSlantedBackground)
-        // setSection(this.closeIcon, resources.icons.closeW)
-        // this.closeIcon.positionX = width ? width / 2 - 25 : 175 + 40
-        // this.closeIcon.positionY = height ? height / 2 - 25 : 100 + 38
+
+        this._texture = AtlasTheme.ATLAS_PATH_DARK
+
+        this._closeIconData.style = CloseIconStyles.CLOSEW
+        this._closeIconData.xPosition = 15
+
         break
-      default:
-        // this.texture = new Texture(style)
-        // this.closeIcon.visible = false
     }
+  }
+
+  private _close = (): void => {
+    this._onClose()
+
+    this.hide()
   }
 }

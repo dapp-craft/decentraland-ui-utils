@@ -5,19 +5,19 @@ import { UIObject, UIObjectConfig } from '../../../UIObject'
 
 import { getImageAtlasMapping, ImageAtlasData } from '../../../../utils/imageUtils'
 
-import { atlasPathLight, sourcesComponentsCoordinates } from '../../../../constants/resources'
+import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../constants/resources'
 
 export enum CloseIconStyles {
   CLOSEW = `closeW`,
   CLOSED = `closeD`,
 }
 
-type CloseIconConfig = UIObjectConfig & {
+export type CloseIconConfig = UIObjectConfig & {
   style: CloseIconStyles;
-  width: number;
-  height: number;
-  xPosition: number;
-  yPosition: number;
+  width?: number;
+  height?: number;
+  xPosition?: number;
+  yPosition?: number;
   onMouseDown: Callback;
 }
 
@@ -26,8 +26,8 @@ const promptInitialConfig: Required<CloseIconConfig> = {
   style: CloseIconStyles.CLOSED,
   width: 32,
   height: 32,
-  xPosition: 0,
-  yPosition: 0,
+  xPosition: 10,
+  yPosition: 10,
   onMouseDown: () => {
   },
 } as const
@@ -68,24 +68,23 @@ export class CloseIcon extends UIObject {
     this._xPosition = xPosition
     this._yPosition = yPosition
     this._onMouseDown = onMouseDown
-
-
   }
 
-  public render(): ReactEcs.JSX.Element {
+  public render(key?: string): ReactEcs.JSX.Element {
     return (
       <UiEntity
+        key={key}
         uiTransform={{
           display: this.visible ? 'flex' : 'none',
           width: this._width,
           height: this._height,
           positionType: 'absolute',
-          position: { top: this._yPosition, right: this._xPosition * -1 },
+          position: { top: this._yPosition, right: this._xPosition },
         }}
         uiBackground={{
           textureMode: 'stretch',
           texture: {
-            src: atlasPathLight,
+            src: AtlasTheme.ATLAS_PATH_LIGHT,
           },
           uvs: getImageAtlasMapping(this._section),
         }}
