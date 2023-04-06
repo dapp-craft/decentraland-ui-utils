@@ -37,7 +37,7 @@ const promptTitle = customPrompt.addText({
   value: 'What will you do?',
   xPosition: 0,
   yPosition: 130,
-  color: Color4.Red(),
+  color: Color4.Yellow(),
   size: 30,
 })
 
@@ -64,6 +64,14 @@ const promptSwitch = customPrompt.addSwitch({
   onCheck: () => {
   },
   onUncheck: () => {
+  },
+})
+
+const promptTextBox = customPrompt.addTextBox({
+  placeholder: 'Enter text',
+  xPosition: 0,
+  yPosition: 0,
+  onChange: () => {
   },
 })
 

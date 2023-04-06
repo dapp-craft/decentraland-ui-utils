@@ -13,6 +13,7 @@ import { PromptSwitch, PromptSwitchConfig } from './components/Switch'
 import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
 
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../constants/resources'
+import { PromptInput, PromptInputConfig } from './components/Input'
 
 export enum PromptStyles {
   LIGHT = `light`,
@@ -51,7 +52,7 @@ export class Prompt extends UIObject {
   private readonly _height: number
   private readonly _style: PromptStyles
   private readonly _onClose: Callback
-  private _components: (PromptCloseIcon | PromptText | PromptIcon | PromptButton | PromptCheckbox | PromptSwitch)[]
+  private _components: (PromptCloseIcon | PromptText | PromptIcon | PromptButton | PromptCheckbox | PromptSwitch | PromptInput)[]
   private readonly _closeIconData: PromptCloseIconConfig
   private readonly _isDarkTheme: boolean
 
@@ -91,6 +92,18 @@ export class Prompt extends UIObject {
     this._components = [new PromptCloseIcon(this._closeIconData)]
 
     this._isDarkTheme = this._texture !== AtlasTheme.ATLAS_PATH_LIGHT
+  }
+
+  public addTextBox(config: Omit<Omit<PromptInputConfig, 'promptHeight'>, 'promptWidth'>): PromptInput {
+    const uiInput = new PromptInput({
+      ...config,
+      promptWidth: this._width,
+      promptHeight: this._height,
+    })
+
+    this._components.push(uiInput)
+
+    return uiInput
   }
 
   public addSwitch(config: Omit<Omit<PromptSwitchConfig, 'promptHeight'>, 'promptWidth'>): PromptSwitch {

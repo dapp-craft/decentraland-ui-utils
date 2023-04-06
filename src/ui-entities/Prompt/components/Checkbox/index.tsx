@@ -28,8 +28,10 @@ const promptCheckboxInitialConfig: Required<PromptCheckboxConfig> = {
   text: '',
   xPosition: 0,
   yPosition: 0,
-  onCheck: () => {},
-  onUncheck: () => {},
+  onCheck: () => {
+  },
+  onUncheck: () => {
+  },
   large: false,
   darkTheme: false,
   startChecked: false,
@@ -144,7 +146,6 @@ export class PromptCheckbox extends UIObject {
           positionType: 'absolute',
           position: { bottom: this._yPosition, right: this._xPosition * -1 },
         }}
-        onMouseDown={this._click}
       >
         <UiEntity
           {...this.image}
@@ -155,8 +156,9 @@ export class PromptCheckbox extends UIObject {
               atlasWidth: sourcesComponentsCoordinates.atlasWidth,
             }),
           }}
+          onMouseDown={this._click}
         />
-        <Label {...this.label} />
+        <Label{...this.label} />
       </UiEntity>
     )
   }
