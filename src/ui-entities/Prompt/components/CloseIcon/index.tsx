@@ -7,13 +7,13 @@ import { getImageAtlasMapping, ImageAtlasData } from '../../../../utils/imageUti
 
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../constants/resources'
 
-export enum CloseIconStyles {
+export enum PromptCloseIconStyles {
   CLOSEW = `closeW`,
   CLOSED = `closeD`,
 }
 
-export type CloseIconConfig = UIObjectConfig & {
-  style: CloseIconStyles;
+export type PromptCloseIconConfig = UIObjectConfig & {
+  style: PromptCloseIconStyles;
   width?: number;
   height?: number;
   xPosition?: number;
@@ -21,9 +21,9 @@ export type CloseIconConfig = UIObjectConfig & {
   onMouseDown: Callback;
 }
 
-const promptInitialConfig: Required<CloseIconConfig> = {
+const promptCloseIconInitialConfig: Required<PromptCloseIconConfig> = {
   startHidden: false,
-  style: CloseIconStyles.CLOSED,
+  style: PromptCloseIconStyles.CLOSED,
   width: 32,
   height: 32,
   xPosition: 10,
@@ -34,8 +34,8 @@ const promptInitialConfig: Required<CloseIconConfig> = {
 
 /**
  * Prompt close button
- * @param {boolean} [startHidden=true] startHidden starting hidden
- * @param {CloseIconStyles} [style=CloseIconStyles.CLOSED] visible variant
+ * @param {boolean} [startHidden=false] startHidden starting hidden
+ * @param {PromptCloseIconStyles} [style=CloseIconStyles.CLOSED] visible variant
  * @param {number} [width=32] image width
  * @param {number} [height=32] image height
  * @param {number} [xPosition=0] position on X
@@ -43,7 +43,7 @@ const promptInitialConfig: Required<CloseIconConfig> = {
  * @param {Callback} [onMouseDown=0] click action
  *
  */
-export class CloseIcon extends UIObject {
+export class PromptCloseIcon extends UIObject {
   private readonly _section: ImageAtlasData
   private readonly _width: number
   private readonly _height: number
@@ -53,14 +53,14 @@ export class CloseIcon extends UIObject {
 
   constructor(
     {
-      startHidden = promptInitialConfig.startHidden,
-      style = promptInitialConfig.style,
+      startHidden = promptCloseIconInitialConfig.startHidden,
+      style = promptCloseIconInitialConfig.style,
       width = sourcesComponentsCoordinates.icons[style].sourceWidth,
       height = sourcesComponentsCoordinates.icons[style].sourceHeight,
-      xPosition = promptInitialConfig.xPosition,
-      yPosition = promptInitialConfig.yPosition,
-      onMouseDown = promptInitialConfig.onMouseDown,
-    }: CloseIconConfig) {
+      xPosition = promptCloseIconInitialConfig.xPosition,
+      yPosition = promptCloseIconInitialConfig.yPosition,
+      onMouseDown = promptCloseIconInitialConfig.onMouseDown,
+    }: PromptCloseIconConfig) {
     super({ startHidden })
 
     this._section = {

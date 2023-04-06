@@ -6,6 +6,7 @@ import { LargeIcon, MediumIcon, SmallIcon } from './ui-entities/Icon'
 import { Loading as LoadingIcon } from './ui-entities/Loading'
 import { CenterImage } from './ui-entities/CenterImage'
 import { Prompt as CustomPrompt, PromptStyles } from './ui-entities/Prompt'
+import { PromptButtonStyles as ButtonStyles } from './ui-entities/Prompt/components/Button'
 
 // import { engine } from '@dcl/sdk/ecs'
 
@@ -22,6 +23,7 @@ export {
   LoadingIcon,
   CustomPrompt,
   PromptStyles,
+  ButtonStyles,
 }
 
 // let timer: number = 7

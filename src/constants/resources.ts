@@ -7,6 +7,30 @@ export const sourcesComponentsCoordinates = {
   atlasHeight: 1024,
   atlasWidth: 1024,
   buttons: {
+    E: {
+      sourceWidth: 26,
+      sourceHeight: 26,
+      sourceLeft: 697,
+      sourceTop: 611
+    },
+    F: {
+      sourceWidth: 26,
+      sourceHeight: 26,
+      sourceLeft: 733,
+      sourceTop: 611
+    },
+    EBlack: {
+      sourceWidth: 26,
+      sourceHeight: 26,
+      sourceLeft: 766,
+      sourceTop: 611
+    },
+    FBlack: {
+      sourceWidth: 26,
+      sourceHeight: 26,
+      sourceLeft: 802,
+      sourceTop: 611
+    },
     buttonE: {
       sourceWidth: 174,
       sourceHeight: 46,
@@ -25,13 +49,13 @@ export const sourcesComponentsCoordinates = {
       sourceLeft: 698,
       sourceTop: 662
     },
-    buttonRed: {
+    red: {
       sourceWidth: 174,
       sourceHeight: 46,
       sourceLeft: 512,
       sourceTop: 662
     },
-    buttonDark: {
+    dark: {
       sourceWidth: 174,
       sourceHeight: 46,
       sourceLeft: 512,
@@ -84,32 +108,6 @@ export const sourcesComponentsCoordinates = {
       sourceHeight: 32,
       sourceLeft: 646,
       sourceTop: 568
-    }
-  },
-  buttonLabels: {
-    E: {
-      sourceWidth: 26,
-      sourceHeight: 26,
-      sourceLeft: 697,
-      sourceTop: 611
-    },
-    F: {
-      sourceWidth: 26,
-      sourceHeight: 26,
-      sourceLeft: 733,
-      sourceTop: 611
-    },
-    EBlack: {
-      sourceWidth: 26,
-      sourceHeight: 26,
-      sourceLeft: 766,
-      sourceTop: 611
-    },
-    FBlack: {
-      sourceWidth: 26,
-      sourceHeight: 26,
-      sourceLeft: 802,
-      sourceTop: 611
     }
   },
   backgrounds: {

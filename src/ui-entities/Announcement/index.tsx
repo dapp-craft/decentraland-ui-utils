@@ -87,7 +87,7 @@ export class Announcement extends UIObject {
           display: this.visible ? 'flex' : 'none',
           positionType: 'absolute',
           position: { bottom: '50%', left: '50%' },
-          margin: { left: this._xOffset, top: this._yOffset * -1 },
+          margin: { left: this._xOffset, bottom: this._yOffset },
         }}
       />
     )

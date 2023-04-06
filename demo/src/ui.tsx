@@ -1,14 +1,14 @@
 import { ReactEcsRenderer } from '@dcl/sdk/react-ecs'
-
-import * as ui from '@dcl/ui-scene-utils'
 import { Color4 } from '@dcl/sdk/math'
 
+import * as ui from '@dcl/ui-scene-utils'
+
 const customPrompt = new ui.CustomPrompt({ style: ui.PromptStyles.DARKSLANTED })
-const announcement = new ui.Announcement({ value: 'Text center' })
-const loadingIcon = new ui.LoadingIcon()
-const smallIcon = new ui.SmallIcon({ image: 'images/icons/heart-icon.png', xOffset: -100, yOffset: 100 })
-const mediumIcon = new ui.MediumIcon({ image: 'images/icons/heart-icon.png', xOffset: -200, yOffset: 200 })
-const largeIcon = new ui.LargeIcon({ image: 'images/icons/heart-icon.png', xOffset: -300, yOffset: 300 })
+const announcement = new ui.Announcement({ value: 'Text center', yOffset: 400 })
+const loadingIcon = new ui.LoadingIcon({ yOffset: 300 })
+const smallIcon = new ui.SmallIcon({ image: 'images/icons/heart-icon.png', yOffset: 150 })
+const mediumIcon = new ui.MediumIcon({ image: 'images/icons/heart-icon.png', yOffset: 210 })
+const largeIcon = new ui.LargeIcon({ image: 'images/icons/heart-icon.png', yOffset: 300 })
 const uiCounter = new ui.UICounter({ value: 123 })
 const cornerLabel = new ui.CornerLabel({ value: 'Label', xOffset: -300, yOffset: 70 })
 const uiBar = new ui.UIBar({ value: .5, xOffset: -500, yOffset: 60 })
@@ -32,30 +32,57 @@ export function setupUi() {
 }
 
 customPrompt.show()
-customPrompt.addText({
+
+const text = customPrompt.addText({
   value: 'What will you do?',
   xPosition: 0,
   yPosition: 130,
   color: Color4.Red(),
   size: 30,
 })
+
+const buttonY = customPrompt.addButton({
+  style: ui.ButtonStyles.E,
+  text: 'Yeah',
+  xPosition: 0,
+  yPosition: -30,
+  onMouseDown: () => {}
+})
+
+const buttonN = customPrompt.addButton({
+  style: ui.ButtonStyles.F,
+  text: 'Nope',
+  xPosition: 0,
+  yPosition: -90,
+  onMouseDown: () => {}
+})
+
 customPrompt.addText({
   value: 'It\'s an important decision',
   xPosition: 0,
   yPosition: 100,
 })
-customPrompt.addIcon({
-  image: 'images/icons/heart-icon.png',
+
+customPrompt.addCheckbox({
+  text: 'Don\'t show again',
+  xPosition: -80,
+  yPosition: 50,
+  onCheck: () => {},
+  onUncheck: () => {},
 })
 
-// announcement.show()
-// loadingIcon.show()
-// smallIcon.show()
-// mediumIcon.show()
-// largeIcon.show()
-// uiCounter.show()
-// cornerLabel.show()
-// uiBar.show()
+// customPrompt.addIcon({
+//   image: 'images/icons/heart-icon.png',
+// })
+
+announcement.show()
+loadingIcon.show()
+smallIcon.show()
+mediumIcon.show()
+largeIcon.show()
+uiCounter.show()
+cornerLabel.show()
+uiBar.show()
 
 // let timer: number = 10
 //

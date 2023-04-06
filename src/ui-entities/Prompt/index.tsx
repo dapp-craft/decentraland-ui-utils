@@ -3,9 +3,11 @@ import { Callback } from '@dcl/react-ecs/dist/components/listeners/types'
 
 import { UIObject, UIObjectConfig } from '../UIObject'
 
-import { CloseIcon, CloseIconConfig, CloseIconStyles } from './components/CloseIcon'
-import { Text, TextConfig } from './components/Text'
-import { Icon, IconConfig } from '../Icon'
+import { PromptCloseIcon, PromptCloseIconConfig, PromptCloseIconStyles } from './components/CloseIcon'
+import { PromptText, PromptTextConfig } from './components/Text'
+import { PromptIcon, PromptIconConfig } from './components/Icon'
+import { PromptButton, PromptButtonConfig } from './components/Button'
+import { PromptCheckbox, PromptCheckboxConfig } from './components/Checkbox'
 
 import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
 
@@ -48,8 +50,9 @@ export class Prompt extends UIObject {
   private readonly _height: number
   private readonly _style: PromptStyles
   private readonly _onClose: Callback
-  private _components: any[]
-  private readonly _closeIconData: CloseIconConfig
+  private _components: (PromptCloseIcon | PromptText | PromptIcon | PromptButton | PromptCheckbox)[]
+  private readonly _closeIconData: PromptCloseIconConfig
+  private readonly _isDarkTheme: boolean
 
   constructor(
     {
@@ -75,7 +78,7 @@ export class Prompt extends UIObject {
     this._closeIconData = {
       width: 32,
       height: 32,
-      style: CloseIconStyles.CLOSED,
+      style: PromptCloseIconStyles.CLOSED,
       onMouseDown: this._close,
     }
 
@@ -84,20 +87,58 @@ export class Prompt extends UIObject {
     this._width = width ? width : this._section.sourceWidth
     this._height = height ? height : this._section.sourceHeight
 
-    this._components = [new CloseIcon(this._closeIconData)]
+    this._components = [new PromptCloseIcon(this._closeIconData)]
+
+    this._isDarkTheme = this._texture !== AtlasTheme.ATLAS_PATH_LIGHT
   }
 
-  public addIcon(config: IconConfig): void {
-    this._components.push(new Icon({
+  public addCheckbox(config: Omit<Omit<PromptCheckboxConfig, 'promptHeight'>, 'promptWidth'>): PromptCheckbox {
+    const button = new PromptCheckbox(
+      {
+        ...config,
+        promptWidth: this._width,
+        promptHeight: this._height,
+        darkTheme: this._isDarkTheme,
+      },
+    )
+
+    this._components.push(button)
+
+    return button
+  }
+
+  public addButton(config: Omit<Omit<PromptButtonConfig, 'promptHeight'>, 'promptWidth'>): PromptButton {
+    const button = new PromptButton(
+      {
+        ...config,
+        promptWidth: this._width,
+        promptHeight: this._height,
+      },
+    )
+
+    this._components.push(button)
+
+    return button
+  }
+
+  public addText(config: Omit<PromptTextConfig, 'darkTheme'>): PromptText {
+    const text = new PromptText({ ...config, darkTheme: this._isDarkTheme })
+
+    this._components.push(text)
+
+    return text
+  }
+
+  public addIcon(config: PromptIconConfig): PromptIcon {
+    const icon = new PromptIcon({
       ...config,
-      startHidden: false,
       xOffset: this._width / -2 + (config.width || 128) / 2 + (config.xOffset || 0),
       yOffset: this._height / 2 + (config.height || 128) / -2 + (config.yOffset || 0),
-    }))
-  }
+    })
 
-  public addText(config: Omit<TextConfig, 'darkTheme'>): void {
-    this._components.push(new Text({ ...config, darkTheme: this._texture !== AtlasTheme.ATLAS_PATH_LIGHT }))
+    this._components.push(icon)
+
+    return icon
   }
 
   public render(): ReactEcs.JSX.Element {
@@ -150,7 +191,7 @@ export class Prompt extends UIObject {
 
         this._texture = AtlasTheme.ATLAS_PATH_LIGHT
 
-        this._closeIconData.style = CloseIconStyles.CLOSED
+        this._closeIconData.style = PromptCloseIconStyles.CLOSED
 
         break
       case PromptStyles.DARK:
@@ -162,7 +203,7 @@ export class Prompt extends UIObject {
 
         this._texture = AtlasTheme.ATLAS_PATH_DARK
 
-        this._closeIconData.style = CloseIconStyles.CLOSEW
+        this._closeIconData.style = PromptCloseIconStyles.CLOSEW
 
         break
       case PromptStyles.LIGHTLARGE:
@@ -174,7 +215,7 @@ export class Prompt extends UIObject {
 
         this._texture = AtlasTheme.ATLAS_PATH_LIGHT
 
-        this._closeIconData.style = CloseIconStyles.CLOSED
+        this._closeIconData.style = PromptCloseIconStyles.CLOSED
 
         break
       case PromptStyles.DARKLARGE:
@@ -186,7 +227,7 @@ export class Prompt extends UIObject {
 
         this._texture = AtlasTheme.ATLAS_PATH_DARK
 
-        this._closeIconData.style = CloseIconStyles.CLOSEW
+        this._closeIconData.style = PromptCloseIconStyles.CLOSEW
 
         break
       case PromptStyles.LIGHTSLANTED:
@@ -198,7 +239,7 @@ export class Prompt extends UIObject {
 
         this._texture = AtlasTheme.ATLAS_PATH_LIGHT
 
-        this._closeIconData.style = CloseIconStyles.CLOSED
+        this._closeIconData.style = PromptCloseIconStyles.CLOSED
         this._closeIconData.xPosition = 15
 
         break
@@ -212,7 +253,7 @@ export class Prompt extends UIObject {
 
         this._texture = AtlasTheme.ATLAS_PATH_DARK
 
-        this._closeIconData.style = CloseIconStyles.CLOSEW
+        this._closeIconData.style = PromptCloseIconStyles.CLOSEW
         this._closeIconData.xPosition = 15
 
         break
