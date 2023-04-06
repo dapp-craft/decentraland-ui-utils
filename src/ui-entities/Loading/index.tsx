@@ -30,7 +30,7 @@ const loadingInitialConfig: Required<LoadingConfig & LoadingSizeConfig> = {
 
 /**
  * Displays a loading icon in the center of the screen
- * @param {boolean} [startHidden=true] startHidden starting hidden
+ * @param {boolean} [startHidden=true] starting hidden
  * @param {number} [duration=0] seconds to display the image onscreen. 0 keeps it on till you hide it manually
  * @param {number} [xOffset=0] offset on X
  * @param {number} [yOffset=0] offset on Y

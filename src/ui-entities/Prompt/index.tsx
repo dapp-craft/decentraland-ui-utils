@@ -8,6 +8,7 @@ import { PromptText, PromptTextConfig } from './components/Text'
 import { PromptIcon, PromptIconConfig } from './components/Icon'
 import { PromptButton, PromptButtonConfig } from './components/Button'
 import { PromptCheckbox, PromptCheckboxConfig } from './components/Checkbox'
+import { PromptSwitch, PromptSwitchConfig } from './components/Switch'
 
 import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
 
@@ -40,7 +41,7 @@ const promptInitialConfig: Required<PromptConfig> = {
 
 /**
  * Displays a loading icon in the center of the screen
- * @param {boolean} [startHidden=true] startHidden starting hidden
+ * @param {boolean} [startHidden=true] starting hidden
  *
  */
 export class Prompt extends UIObject {
@@ -50,7 +51,7 @@ export class Prompt extends UIObject {
   private readonly _height: number
   private readonly _style: PromptStyles
   private readonly _onClose: Callback
-  private _components: (PromptCloseIcon | PromptText | PromptIcon | PromptButton | PromptCheckbox)[]
+  private _components: (PromptCloseIcon | PromptText | PromptIcon | PromptButton | PromptCheckbox | PromptSwitch)[]
   private readonly _closeIconData: PromptCloseIconConfig
   private readonly _isDarkTheme: boolean
 
@@ -92,8 +93,8 @@ export class Prompt extends UIObject {
     this._isDarkTheme = this._texture !== AtlasTheme.ATLAS_PATH_LIGHT
   }
 
-  public addCheckbox(config: Omit<Omit<PromptCheckboxConfig, 'promptHeight'>, 'promptWidth'>): PromptCheckbox {
-    const button = new PromptCheckbox(
+  public addSwitch(config: Omit<Omit<PromptSwitchConfig, 'promptHeight'>, 'promptWidth'>): PromptSwitch {
+    const uiSwitch = new PromptSwitch(
       {
         ...config,
         promptWidth: this._width,
@@ -102,13 +103,28 @@ export class Prompt extends UIObject {
       },
     )
 
-    this._components.push(button)
+    this._components.push(uiSwitch)
 
-    return button
+    return uiSwitch
+  }
+
+  public addCheckbox(config: Omit<Omit<PromptCheckboxConfig, 'promptHeight'>, 'promptWidth'>): PromptCheckbox {
+    const uiCheckbox = new PromptCheckbox(
+      {
+        ...config,
+        promptWidth: this._width,
+        promptHeight: this._height,
+        darkTheme: this._isDarkTheme,
+      },
+    )
+
+    this._components.push(uiCheckbox)
+
+    return uiCheckbox
   }
 
   public addButton(config: Omit<Omit<PromptButtonConfig, 'promptHeight'>, 'promptWidth'>): PromptButton {
-    const button = new PromptButton(
+    const uiButton = new PromptButton(
       {
         ...config,
         promptWidth: this._width,
@@ -116,29 +132,29 @@ export class Prompt extends UIObject {
       },
     )
 
-    this._components.push(button)
+    this._components.push(uiButton)
 
-    return button
+    return uiButton
   }
 
   public addText(config: Omit<PromptTextConfig, 'darkTheme'>): PromptText {
-    const text = new PromptText({ ...config, darkTheme: this._isDarkTheme })
+    const uiText = new PromptText({ ...config, darkTheme: this._isDarkTheme })
 
-    this._components.push(text)
+    this._components.push(uiText)
 
-    return text
+    return uiText
   }
 
   public addIcon(config: PromptIconConfig): PromptIcon {
-    const icon = new PromptIcon({
+    const uiIcon = new PromptIcon({
       ...config,
       xOffset: this._width / -2 + (config.width || 128) / 2 + (config.xOffset || 0),
       yOffset: this._height / 2 + (config.height || 128) / -2 + (config.yOffset || 0),
     })
 
-    this._components.push(icon)
+    this._components.push(uiIcon)
 
-    return icon
+    return uiIcon
   }
 
   public render(): ReactEcs.JSX.Element {

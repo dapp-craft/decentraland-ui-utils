@@ -28,7 +28,7 @@ const promptTextInitialConfig: Required<PromptTextConfig> = {
 
 /**
  * Prompt text
- * @param {boolean} [startHidden=false] startHidden starting hidden
+ * @param {boolean} [startHidden=false] starting hidden
  * @param {string | number} [value=''] starting value
  * @param {number} [xPosition=0] Position on X on the prompt, counting from the center of the prompt
  * @param {number} [yPosition=0] Position on Y on the prompt, counting from the center of the prompt

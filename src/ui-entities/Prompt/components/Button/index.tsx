@@ -55,7 +55,7 @@ const promptButtonInitialConfig: Required<PromptButtonConfig> = {
 
 /**
  * Prompt button
- * @param {boolean} [startHidden=false] startHidden starting hidden
+ * @param {boolean} [startHidden=false] starting hidden
  * @param {string | number} [text=''] label text
  * @param {number} [xPosition=0] Position on X on the prompt, counting from the center of the prompt
  * @param {number} [yPosition=0] Position on Y on the prompt, counting from the center of the prompt

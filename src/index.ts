@@ -7,8 +7,7 @@ import { Loading as LoadingIcon } from './ui-entities/Loading'
 import { CenterImage } from './ui-entities/CenterImage'
 import { Prompt as CustomPrompt, PromptStyles } from './ui-entities/Prompt'
 import { PromptButtonStyles as ButtonStyles } from './ui-entities/Prompt/components/Button'
-
-// import { engine } from '@dcl/sdk/ecs'
+import { PromptSwitchStyles as SwitchStyles } from './ui-entities/Prompt/components/Switch'
 
 export {
   Announcement,
@@ -24,18 +23,5 @@ export {
   CustomPrompt,
   PromptStyles,
   ButtonStyles,
+  SwitchStyles,
 }
-
-// let timer: number = 7
-//
-// function LoopSystem(dt: number) {
-//   timer -= dt
-//   if (timer <= 0) {
-//     timer = 7
-//     // DO SOMETHING
-//
-//     console.log('index timer4444 --------------------------------------------------------')
-//   }
-// }
-//
-// engine.addSystem(LoopSystem)

@@ -16,7 +16,7 @@ const promptIconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
 
 /**
  * Prompt icon
- * @param {boolean} [startHidden=false] startHidden starting hidden
+ * @param {boolean} [startHidden=false] starting hidden
  * @param {string} image path to image file
  * @param {number} [width=128] image width
  * @param {number} [height=128] image height

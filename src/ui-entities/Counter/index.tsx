@@ -29,7 +29,7 @@ const counterInitialConfig: Required<CounterConfig> = {
 /**
  * Displays a number on the bottom-right of the UI.
  *
- * @param {boolean} [startHidden=true] startHidden starting hidden
+ * @param {boolean} [startHidden=true] starting hidden
  * @param {number} [value=0] starting value
  * @param {number} [xOffset=-40] position on X, to enable fitting several counters
  * @param {number} [yOffset=70] position on Y, to enable fitting several counters

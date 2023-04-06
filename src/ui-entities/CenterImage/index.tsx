@@ -27,7 +27,7 @@ const centerImageInitialConfig: Omit<Required<CenterImageConfig>, 'section'> = {
 /**
  * Displays an image of 512x512 in the center of the screen for limited time.
  *
- * @param {boolean} [startHidden=true] startHidden starting hidden
+ * @param {boolean} [startHidden=true] starting hidden
  * @param {string} image path to image file
  * @param {number} [duration=0] seconds to display the image onscreen. 0 keeps it on till you hide it
  * @param {number} [xOffset=0] offset on X

@@ -291,6 +291,12 @@ export const sourcesComponentsCoordinates = {
       sourceLeft: 783,
       sourceTop: 454
     },
+    squareOff: {
+      sourceWidth: 64,
+      sourceHeight: 32,
+      sourceLeft: 783,
+      sourceTop: 501
+    },
     roundRed: {
       sourceWidth: 64,
       sourceHeight: 32,
@@ -303,12 +309,6 @@ export const sourcesComponentsCoordinates = {
       sourceLeft: 923,
       sourceTop: 454
     },
-    squareOff: {
-      sourceWidth: 64,
-      sourceHeight: 32,
-      sourceLeft: 783,
-      sourceTop: 501
-    },
     squareRed: {
       sourceWidth: 64,
       sourceHeight: 32,
@@ -319,7 +319,7 @@ export const sourcesComponentsCoordinates = {
       sourceWidth: 64,
       sourceHeight: 32,
       sourceLeft: 921,
-      sourceTop: 501
+      sourceTop: 500
     }
   }
 }

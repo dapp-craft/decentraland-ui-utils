@@ -33,7 +33,7 @@ export function setupUi() {
 
 customPrompt.show()
 
-const text = customPrompt.addText({
+const promptTitle = customPrompt.addText({
   value: 'What will you do?',
   xPosition: 0,
   yPosition: 130,
@@ -41,34 +41,48 @@ const text = customPrompt.addText({
   size: 30,
 })
 
-const buttonY = customPrompt.addButton({
-  style: ui.ButtonStyles.E,
-  text: 'Yeah',
-  xPosition: 0,
-  yPosition: -30,
-  onMouseDown: () => {}
-})
-
-const buttonN = customPrompt.addButton({
-  style: ui.ButtonStyles.F,
-  text: 'Nope',
-  xPosition: 0,
-  yPosition: -90,
-  onMouseDown: () => {}
-})
-
-customPrompt.addText({
+const promptText = customPrompt.addText({
   value: 'It\'s an important decision',
   xPosition: 0,
   yPosition: 100,
 })
 
-customPrompt.addCheckbox({
+const promptCheckbox = customPrompt.addCheckbox({
   text: 'Don\'t show again',
   xPosition: -80,
   yPosition: 50,
-  onCheck: () => {},
-  onUncheck: () => {},
+  onCheck: () => {
+  },
+  onUncheck: () => {
+  },
+})
+
+const promptSwitch = customPrompt.addSwitch({
+  text: 'Turn me',
+  xPosition: -60,
+  yPosition: 0,
+  onCheck: () => {
+  },
+  onUncheck: () => {
+  },
+})
+
+const promptButtonY = customPrompt.addButton({
+  style: ui.ButtonStyles.E,
+  text: 'Yeah',
+  xPosition: 0,
+  yPosition: -60,
+  onMouseDown: () => {
+  },
+})
+
+const promptButtonN = customPrompt.addButton({
+  style: ui.ButtonStyles.F,
+  text: 'Nope',
+  xPosition: 0,
+  yPosition: -120,
+  onMouseDown: () => {
+  },
 })
 
 // customPrompt.addIcon({

@@ -39,7 +39,7 @@ const iconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
 /**
  * Displays an icon in the bottom-left corner.
  *
- * @param {boolean} [startHidden=true] startHidden starting hidden
+ * @param {boolean} [startHidden=true] starting hidden
  * @param {string} image path to image file
  * @param {number} [width=128] image width
  * @param {number} [height=128] image height
@@ -114,7 +114,7 @@ const smallIconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
 /**
  * Displays an icon of 32x32 in the bottom-left corner.
  *
- * @param {boolean} [startHidden=false] startHidden starting hidden
+ * @param {boolean} [startHidden=false] starting hidden
  * @param {string} image path to image file
  * @param {number} [width=32] image width
  * @param {number} [height=32] image height
@@ -142,7 +142,7 @@ const mediumIconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
 /**
  * Displays an icon of 64x64 in the bottom-left corner.
  *
- * @param {boolean} [startHidden=false] startHidden starting hidden
+ * @param {boolean} [startHidden=false] starting hidden
  * @param {string} image path to image file
  * @param {number} [width=64] image width
  * @param {number} [height=64] image height
@@ -170,7 +170,7 @@ const largeIconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
 /**
  * Displays an icon of 128x128 in the bottom-left corner.
  *
- * @param {boolean} [startHidden=false] startHidden starting hidden
+ * @param {boolean} [startHidden=false] starting hidden
  * @param {string} image path to image file
  * @param {number} [width=128] image width
  * @param {number} [height=128] image height

@@ -29,7 +29,7 @@ const announcementInitialConfig: Required<AnnouncementConfig> = {
 /**
  * Displays a text on center of the UI.
  *
- * @param {boolean} [startHidden=true] startHidden starting hidden
+ * @param {boolean} [startHidden=true] starting hidden
  * @param {string | number} [value=''] starting value
  * @param {number} [duration=3] duration time to keep the text visible (in seconds)
  * @param {number} [xOffset=0] offset on X

@@ -10,87 +10,91 @@ import { getImageAtlasMapping } from '../../../../utils/imageUtils'
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../constants/resources'
 import { defaultFont } from '../../../../constants/font'
 
-export type PromptCheckboxConfig = UIObjectConfig & {
+export enum PromptSwitchStyles {
+  ROUNDGREEN = `roundGreen`,
+  ROUNDRED = `roundRed`,
+  SQUAREGREEN = `squareGreen`,
+  SQUARERED = `squareRed`
+}
+
+export type PromptSwitchConfig = UIObjectConfig & {
   text: string | number;
   xPosition: number;
   yPosition: number;
   onCheck?: () => void;
   onUncheck?: () => void;
-  large?: boolean;
   darkTheme?: boolean;
   startChecked?: boolean;
+  style?: PromptSwitchStyles;
   promptWidth: number;
   promptHeight: number;
 }
 
-const promptCheckboxInitialConfig: Required<PromptCheckboxConfig> = {
+const promptSwitchInitialConfig: Required<PromptSwitchConfig> = {
   startHidden: false,
   text: '',
   xPosition: 0,
   yPosition: 0,
   onCheck: () => {},
   onUncheck: () => {},
-  large: false,
   darkTheme: false,
   startChecked: false,
+  style: PromptSwitchStyles.ROUNDGREEN,
   promptWidth: 400,
   promptHeight: 250,
 } as const
 
 /**
- * Prompt checkbox
+ * Prompt switch
  * @param {boolean} [startHidden=false] starting hidden
  * @param {string} [label=''] Text to display on the right of the box
  * @param {number} [xPosition=0] Position on X on the prompt, counting from the center of the prompt
  * @param {number} [yPosition=0] Position on Y on the prompt, counting from the center of the prompt
  * @param {() => void} onCheck Function to call every time the box is checked
  * @param {() => void} onUncheck Function to call every time the box is unchecked
- * @param {boolean} [large=false] Makes the checkbox significantly larger
  * @param {boolean} [startChecked=false] Starts the checkbox in a default state of already checked
  *
  */
-export class PromptCheckbox extends UIObject {
+export class PromptSwitch extends UIObject {
   public image: EntityPropTypes
   public label: EntityPropTypes & UiLabelProps
 
   private _checked: boolean
   private readonly _xPosition: number
   private readonly _yPosition: number
-  private readonly _darkTheme: boolean
-  private readonly _large: boolean
+  private readonly _style: PromptSwitchStyles
   private readonly _onCheck: () => void
   private readonly _onUncheck: () => void
 
   constructor(
     {
-      startHidden = promptCheckboxInitialConfig.startHidden,
-      text = promptCheckboxInitialConfig.text,
-      xPosition = promptCheckboxInitialConfig.xPosition,
-      yPosition = promptCheckboxInitialConfig.yPosition,
-      onCheck = promptCheckboxInitialConfig.onCheck,
-      onUncheck = promptCheckboxInitialConfig.onUncheck,
-      large = promptCheckboxInitialConfig.large,
-      startChecked = promptCheckboxInitialConfig.startChecked,
-      darkTheme = promptCheckboxInitialConfig.darkTheme,
-      promptWidth = promptCheckboxInitialConfig.promptWidth,
-      promptHeight = promptCheckboxInitialConfig.promptHeight,
-    }: PromptCheckboxConfig) {
+      startHidden = promptSwitchInitialConfig.startHidden,
+      text = promptSwitchInitialConfig.text,
+      xPosition = promptSwitchInitialConfig.xPosition,
+      yPosition = promptSwitchInitialConfig.yPosition,
+      onCheck = promptSwitchInitialConfig.onCheck,
+      onUncheck = promptSwitchInitialConfig.onUncheck,
+      startChecked = promptSwitchInitialConfig.startChecked,
+      darkTheme = promptSwitchInitialConfig.darkTheme,
+      style = promptSwitchInitialConfig.style,
+      promptWidth = promptSwitchInitialConfig.promptWidth,
+      promptHeight = promptSwitchInitialConfig.promptHeight,
+    }: PromptSwitchConfig) {
     super({ startHidden })
 
     this._checked = startChecked
-    this._darkTheme = darkTheme
-    this._large = large
 
     this._onCheck = onCheck
     this._onUncheck = onUncheck
+    this._style = style
 
     this._xPosition = (promptWidth / -2) + (promptWidth / 2) + xPosition
     this._yPosition = (promptHeight / 2) + (32 / -2) + yPosition
 
     this.image = {
       uiTransform: {
-        width: this._large ? 32 : 24,
-        height: this._large ? 32 : 24,
+        width: 64,
+        height: 32,
         margin: {
           right: 5,
         },
@@ -150,7 +154,7 @@ export class PromptCheckbox extends UIObject {
           {...this.image}
           uiBackground={{
             ...this.image.uiBackground, uvs: getImageAtlasMapping({
-              ...sourcesComponentsCoordinates.checkboxes[this._getImageStyle()],
+              ...sourcesComponentsCoordinates.switches[this._getImageStyle()],
               atlasHeight: sourcesComponentsCoordinates.atlasHeight,
               atlasWidth: sourcesComponentsCoordinates.atlasWidth,
             }),
@@ -161,18 +165,14 @@ export class PromptCheckbox extends UIObject {
     )
   }
 
-  private _getImageStyle(): 'wLargeOff' | 'wLargeOn' | 'wOff' | 'wOn' | 'dLargeOff' | 'dLargeOn' | 'dOff' | 'dOn' {
-    if (this._darkTheme) {
-      if (this._large) {
-        return !this._checked ? 'wLargeOff' : 'wLargeOn'
-      } else {
-        return !this._checked ? 'wOff' : 'wOn'
-      }
+  private _getImageStyle(): PromptSwitchStyles | 'roundOff' | 'squareOff' {
+    if (this._checked) {
+      return this._style
     } else {
-      if (this._large) {
-        return !this._checked ? 'dLargeOff' : 'dLargeOn'
+      if (this._style == PromptSwitchStyles.ROUNDGREEN || this._style == PromptSwitchStyles.ROUNDRED) {
+        return 'roundOff'
       } else {
-        return !this._checked ? 'dOff' : 'dOn'
+        return 'squareOff'
       }
     }
   }

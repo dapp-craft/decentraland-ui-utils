@@ -34,7 +34,7 @@ const promptCloseIconInitialConfig: Required<PromptCloseIconConfig> = {
 
 /**
  * Prompt close button
- * @param {boolean} [startHidden=false] startHidden starting hidden
+ * @param {boolean} [startHidden=false] starting hidden
  * @param {PromptCloseIconStyles} [style=CloseIconStyles.CLOSED] visible variant
  * @param {number} [width=32] image width
  * @param {number} [height=32] image height

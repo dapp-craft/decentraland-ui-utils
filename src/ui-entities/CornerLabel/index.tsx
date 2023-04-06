@@ -25,7 +25,7 @@ const cornerLabelInitialConfig: Required<CornerLabelConfig> = {
 /**
  * Displays a text on center of the UI.
  *
- * @param {boolean} [startHidden=true] startHidden starting hidden
+ * @param {boolean} [startHidden=true] starting hidden
  * @param {string | number} [value=''] starting value
  * @param {number} [xOffset=-40] offset on X
  * @param {number} [yOffset=70] offset on Y

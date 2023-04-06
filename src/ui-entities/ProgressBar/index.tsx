@@ -40,7 +40,7 @@ const progressBarInitialConfig: Required<ProgressBarConfig> = {
 /**
  * Displays a colored bar that can be filled up and updated to different values.
  *
- * @param {boolean} [startHidden=true] startHidden starting hidden
+ * @param {boolean} [startHidden=true] starting hidden
  * @param {number} [value=0] starting value
  * @param {number} [xOffset=-30] offset on X
  * @param {number} [yOffset=60] offset on Y
