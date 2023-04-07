@@ -1,11 +1,11 @@
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 import { Callback } from '@dcl/react-ecs/dist/components/listeners/types'
 
-import { UIObject, UIObjectConfig } from '../../../UIObject'
+import { UIObject, UIObjectConfig } from '../../../../UIObject'
 
-import { getImageAtlasMapping, ImageAtlasData } from '../../../../utils/imageUtils'
+import { getImageAtlasMapping, ImageAtlasData } from '../../../../../utils/imageUtils'
 
-import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../constants/resources'
+import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../../constants/resources'
 
 export enum PromptCloseIconStyles {
   CLOSEW = `closeW`,

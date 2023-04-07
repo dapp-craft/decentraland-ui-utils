@@ -3,9 +3,9 @@ import { Color4 } from '@dcl/sdk/math'
 import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
 import { UiLabelProps } from '@dcl/react-ecs/dist/components/Label/types'
 
-import { UIObject, UIObjectConfig } from '../../../UIObject'
+import { UIObject, UIObjectConfig } from '../../../../UIObject'
 
-import { defaultFont } from '../../../../constants/font'
+import { defaultFont } from '../../../../../constants/font'
 
 export type PromptTextConfig = UIObjectConfig & {
   value: string | number;

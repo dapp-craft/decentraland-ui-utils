@@ -1,6 +1,6 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
-import { Icon, IconConfig } from '../../../Icon'
+import { Icon, IconConfig } from '../../../../Icon'
 
 export type PromptIconConfig = IconConfig
 

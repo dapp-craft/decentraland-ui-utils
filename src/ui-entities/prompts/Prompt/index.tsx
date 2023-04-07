@@ -1,7 +1,7 @@
-import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import ReactEcs, {UiEntity} from '@dcl/sdk/react-ecs'
 import { Callback } from '@dcl/react-ecs/dist/components/listeners/types'
 
-import { UIObject, UIObjectConfig } from '../UIObject'
+import { UIObject, UIObjectConfig } from '../../UIObject'
 
 import { PromptCloseIcon, PromptCloseIconConfig, PromptCloseIconStyles } from './components/CloseIcon'
 import { PromptText, PromptTextConfig } from './components/Text'
@@ -9,11 +9,11 @@ import { PromptIcon, PromptIconConfig } from './components/Icon'
 import { PromptButton, PromptButtonConfig } from './components/Button'
 import { PromptCheckbox, PromptCheckboxConfig } from './components/Checkbox'
 import { PromptSwitch, PromptSwitchConfig } from './components/Switch'
-
-import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
-
-import { AtlasTheme, sourcesComponentsCoordinates } from '../../constants/resources'
 import { PromptInput, PromptInputConfig } from './components/Input'
+
+import { getImageAtlasMapping, ImageAtlasData } from '../../../utils/imageUtils'
+
+import { AtlasTheme, sourcesComponentsCoordinates } from '../../../constants/resources'
 
 export enum PromptStyles {
   LIGHT = `light`,
@@ -32,7 +32,7 @@ type PromptConfig = UIObjectConfig & {
 }
 
 const promptInitialConfig: Required<PromptConfig> = {
-  startHidden: false,
+  startHidden: true,
   style: PromptStyles.LIGHT,
   width: 400,
   height: 250,

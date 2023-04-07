@@ -3,12 +3,12 @@ import { Color4 } from '@dcl/sdk/math'
 import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
 import { UiLabelProps } from '@dcl/react-ecs/dist/components/Label/types'
 
-import { UIObject, UIObjectConfig } from '../../../UIObject'
+import { UIObject, UIObjectConfig } from '../../../../UIObject'
 
-import { getImageAtlasMapping } from '../../../../utils/imageUtils'
+import { getImageAtlasMapping } from '../../../../../utils/imageUtils'
 
-import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../constants/resources'
-import { defaultFont } from '../../../../constants/font'
+import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../../constants/resources'
+import { defaultFont } from '../../../../../constants/font'
 
 export enum PromptSwitchStyles {
   ROUNDGREEN = `roundGreen`,

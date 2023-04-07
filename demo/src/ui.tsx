@@ -3,6 +3,25 @@ import { Color4 } from '@dcl/sdk/math'
 
 import * as ui from '@dcl/ui-scene-utils'
 
+const fillInPrompt = new ui.FillInPrompt({
+  title: 'What are you thinking?',
+  onAccept: (value: string) => {
+    console.log(`accepted`, value)
+  },
+})
+const optionPrompt = new ui.OptionPrompt({
+  title: 'Pick an option!',
+  text: 'What will you choose?',
+  onAccept: () => {
+    console.log(`accepted`)
+  },
+})
+const okPrompt = new ui.OkPrompt({
+  text: 'This is an Ok Prompt',
+  onAccept: () => {
+    console.log(`accepted`)
+  },
+})
 const customPrompt = new ui.CustomPrompt({ style: ui.PromptStyles.DARKSLANTED })
 const announcement = new ui.Announcement({ value: 'Text center', yOffset: 400 })
 const loadingIcon = new ui.LoadingIcon({ yOffset: 300 })
@@ -15,6 +34,9 @@ const uiBar = new ui.UIBar({ value: .5, xOffset: -500, yOffset: 60 })
 
 const uiComponent = () => {
   return [
+    fillInPrompt.render(),
+    optionPrompt.render(),
+    okPrompt.render(),
     customPrompt.render(),
     announcement.render(),
     loadingIcon.render(),
@@ -31,7 +53,13 @@ export function setupUi() {
   ReactEcsRenderer.setUiRenderer(uiComponent)
 }
 
-customPrompt.show()
+// fillInPrompt.show()
+
+optionPrompt.show()
+
+// okPrompt.show()
+
+// customPrompt.show()
 
 const promptTitle = customPrompt.addText({
   value: 'What will you do?',
@@ -57,15 +85,15 @@ const promptCheckbox = customPrompt.addCheckbox({
   },
 })
 
-const promptSwitch = customPrompt.addSwitch({
-  text: 'Turn me',
-  xPosition: -60,
-  yPosition: 0,
-  onCheck: () => {
-  },
-  onUncheck: () => {
-  },
-})
+// const promptSwitch = customPrompt.addSwitch({
+//   text: 'Turn me',
+//   xPosition: -60,
+//   yPosition: 0,
+//   onCheck: () => {
+//   },
+//   onUncheck: () => {
+//   },
+// })
 
 const promptTextBox = customPrompt.addTextBox({
   placeholder: 'Enter text',
@@ -105,17 +133,3 @@ largeIcon.show()
 uiCounter.show()
 cornerLabel.show()
 uiBar.show()
-
-// let timer: number = 10
-//
-// function LoopSystem(dt: number) {
-//   timer -= dt
-//   if (timer <= 0) {
-//     timer = 10
-//     // DO SOMETHING
-//
-//     console.log('index timer2 --------------------------------------------------------')
-//   }
-// }
-//
-// engine.addSystem(LoopSystem)
