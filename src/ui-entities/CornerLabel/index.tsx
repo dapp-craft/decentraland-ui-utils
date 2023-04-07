@@ -68,9 +68,10 @@ export class CornerLabel extends UIObject {
     this._value = newValue
   }
 
-  public render(): ReactEcs.JSX.Element {
+  public render(key?: string): ReactEcs.JSX.Element {
     return (
       <Label
+        key={key}
         value={String(this._value)}
         color={this._color}
         fontSize={this._size}

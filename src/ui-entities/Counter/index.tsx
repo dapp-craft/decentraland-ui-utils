@@ -103,9 +103,10 @@ export class Counter extends UIObject {
     this._value -= amount ? amount : this._valueStep
   }
 
-  public render(): ReactEcs.JSX.Element {
+  public render(key?: string): ReactEcs.JSX.Element {
     return (
       <Label
+        key={key}
         value={
           toFixedLengthStringUtil(
             {

@@ -159,9 +159,10 @@ export class ProgressBar extends UIObject {
     this._setValueInRange(this._value - (amount ? amount : this._valueChangeStep))
   }
 
-  public render(): ReactEcs.JSX.Element {
+  public render(key?: string): ReactEcs.JSX.Element {
     return (
       <UiEntity
+        key={key}
         uiTransform={{
           display: this.visible ? 'flex' : 'none',
           width: this._width,

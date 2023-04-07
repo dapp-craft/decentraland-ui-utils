@@ -79,9 +79,10 @@ export class Icon extends UIObject {
     if (section) this._section = section
   }
 
-  public render(): ReactEcs.JSX.Element {
+  public render(key?: string): ReactEcs.JSX.Element {
     return (
       <UiEntity
+        key={key}
         uiTransform={{
           display: this.visible ? 'flex' : 'none',
           width: this._width,

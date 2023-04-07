@@ -1,4 +1,4 @@
-import { ReactEcsRenderer } from '@dcl/sdk/react-ecs'
+import ReactEcs, { ReactEcsRenderer } from '@dcl/sdk/react-ecs'
 import { Color4 } from '@dcl/sdk/math'
 
 import * as ui from '@dcl/ui-scene-utils'
@@ -25,27 +25,27 @@ const okPrompt = new ui.OkPrompt({
 const customPrompt = new ui.CustomPrompt({ style: ui.PromptStyles.DARKSLANTED })
 const announcement = new ui.Announcement({ value: 'Text center', yOffset: 400 })
 const loadingIcon = new ui.LoadingIcon({ yOffset: 300 })
-const smallIcon = new ui.SmallIcon({ image: 'images/icons/heart-icon.png', yOffset: 150 })
-const mediumIcon = new ui.MediumIcon({ image: 'images/icons/heart-icon.png', yOffset: 210 })
-const largeIcon = new ui.LargeIcon({ image: 'images/icons/heart-icon.png', yOffset: 300 })
+const smallIcon = new ui.SmallIcon({ image: 'images/scene-thumbnail.png', yOffset: 150 })
+const mediumIcon = new ui.MediumIcon({ image: 'images/scene-thumbnail.png', yOffset: 210 })
+const largeIcon = new ui.LargeIcon({ image: 'images/scene-thumbnail.png', yOffset: 300 })
 const uiCounter = new ui.UICounter({ value: 123 })
 const cornerLabel = new ui.CornerLabel({ value: 'Label', xOffset: -300, yOffset: 70 })
 const uiBar = new ui.UIBar({ value: .5, xOffset: -500, yOffset: 60 })
 
 const uiComponent = () => {
   return [
-    fillInPrompt.render(),
-    optionPrompt.render(),
-    okPrompt.render(),
-    customPrompt.render(),
-    announcement.render(),
-    loadingIcon.render(),
-    smallIcon.render(),
-    mediumIcon.render(),
-    largeIcon.render(),
-    uiCounter.render(),
-    cornerLabel.render(),
-    uiBar.render(),
+    fillInPrompt.render('fillInPrompt'),
+    optionPrompt.render('optionPrompt'),
+    okPrompt.render('okPrompt'),
+    customPrompt.render('customPrompt'),
+    announcement.render('announcement'),
+    loadingIcon.render('loadingIcon'),
+    smallIcon.render('smallIcon'),
+    mediumIcon.render('mediumIcon'),
+    largeIcon.render('largeIcon'),
+    uiCounter.render('uiCounter'),
+    cornerLabel.render('cornerLabel'),
+    uiBar.render('uiBar'),
   ]
 }
 
@@ -55,9 +55,9 @@ export function setupUi() {
 
 // fillInPrompt.show()
 
-optionPrompt.show()
+// optionPrompt.show()
 
-// okPrompt.show()
+okPrompt.show()
 
 // customPrompt.show()
 
@@ -122,7 +122,7 @@ const promptButtonN = customPrompt.addButton({
 })
 
 // customPrompt.addIcon({
-//   image: 'images/icons/heart-icon.png',
+//   image: 'images/scene-thumbnail.png',
 // })
 
 announcement.show()

@@ -1,4 +1,4 @@
-import ReactEcs, {UiEntity} from '@dcl/sdk/react-ecs'
+import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { Callback } from '@dcl/react-ecs/dist/components/listeners/types'
 
 import { UIObject, UIObjectConfig } from '../../UIObject'
@@ -41,8 +41,12 @@ const promptInitialConfig: Required<PromptConfig> = {
 } as const
 
 /**
- * Displays a loading icon in the center of the screen
+ * Creates a prompt object that includes a background and a close icon, and supports adding as many custom UI elements as desired
  * @param {boolean} [startHidden=true] starting hidden
+ * @param {PromptStyles} [style=PromptStyles.LIGHT]: pick from a few predefined options of color, shape and size, or provide the string path to a custom image
+ * @param {number} width background width
+ * @param {number} height background height
+ * @param {Callback} onClose callback on prompt close
  *
  */
 export class Prompt extends UIObject {
@@ -170,9 +174,10 @@ export class Prompt extends UIObject {
     return uiIcon
   }
 
-  public render(): ReactEcs.JSX.Element {
+  public render(key?: string): ReactEcs.JSX.Element {
     return (
       <UiEntity
+        key={key}
         uiTransform={{
           display: this.visible ? 'flex' : 'none',
           flexDirection: 'column',

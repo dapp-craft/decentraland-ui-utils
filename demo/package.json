@@ -10,7 +10,7 @@
     "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next"
   },
   "devDependencies": {
-    "@dcl/sdk": "next"
+    "@dcl/sdk": "latest"
   },
   "engines": {
     "node": ">=16.0.0",
@@ -21,9 +21,5 @@
     "singleQuote": true,
     "printWidth": 120,
     "trailingComma": "none"
-  },
-  "dependencies": {
-    "@dcl/ui-scene-utils": "file:..",
-    "typescript": "^4.4.4"
   }
 }
