@@ -30,8 +30,10 @@ const okPromptInitialConfig: Required<OptionPromptConfig & OptionPromptSizeConfi
   useDarkTheme: false,
   acceptLabel: 'Yes',
   rejectLabel: 'No',
-  onAccept: () => {},
-  onReject: () => {},
+  onAccept: () => {
+  },
+  onReject: () => {
+  },
   width: 480,
   height: 384,
 } as const

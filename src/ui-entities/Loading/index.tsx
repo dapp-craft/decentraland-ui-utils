@@ -1,12 +1,12 @@
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
-import { UIObject, UIObjectConfig } from '../UIObject'
+import { DelayedHidingUIObject, DelayedHidingUIObjectConfig } from '../UIObject'
 
 import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
 
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../constants/resources'
 
-type LoadingConfig = UIObjectConfig & {
+type LoadingConfig = DelayedHidingUIObjectConfig & {
   duration?: number;
   xOffset?: number;
   yOffset?: number;
@@ -31,13 +31,13 @@ const loadingInitialConfig: Required<LoadingConfig & LoadingSizeConfig> = {
 /**
  * Displays a loading icon in the center of the screen
  * @param {boolean} [startHidden=true] starting hidden
- * @param {number} [duration=0] seconds to display the image onscreen. 0 keeps it on till you hide it manually
+ * @param {number} [duration=0] duration time to keep the icon visible (in seconds) if starting visible
  * @param {number} [xOffset=0] offset on X
  * @param {number} [yOffset=0] offset on Y
  * @param {number} [scale=1] multiplier for the size of the bar. 1 = 50 x 66
  *
  */
-export class Loading extends UIObject {
+export class Loading extends DelayedHidingUIObject {
   private readonly _xOffset: number
   private readonly _yOffset: number
   private readonly _width: number
@@ -48,12 +48,12 @@ export class Loading extends UIObject {
   constructor(
     {
       startHidden = loadingInitialConfig.startHidden,
-      // duration = loadingInitialConfig.duration,
+      duration = loadingInitialConfig.duration,
       xOffset = loadingInitialConfig.xOffset,
       yOffset = loadingInitialConfig.yOffset,
       scale = loadingInitialConfig.scale,
     }: LoadingConfig = {}) {
-    super({ startHidden })
+    super({ startHidden, duration })
 
     this._width = loadingInitialConfig.width * scale
     this._height = loadingInitialConfig.height * scale

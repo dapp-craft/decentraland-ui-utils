@@ -6,7 +6,7 @@ import {
   MeshCollider,
   PointerEvents,
   PointerEventType,
-  InputAction
+  InputAction,
 } from '@dcl/sdk/ecs'
 import { Cube } from './components'
 
@@ -32,10 +32,10 @@ export function createCube(x: number, y: number, z: number, spawner = true): Ent
             button: InputAction.IA_PRIMARY,
             hoverText: 'Press E to spawn',
             maxDistance: 100,
-            showFeedback: true
-          }
-        }
-      ]
+            showFeedback: true,
+          },
+        },
+      ],
     })
   }
 

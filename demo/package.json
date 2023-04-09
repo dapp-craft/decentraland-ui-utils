@@ -10,16 +10,23 @@
     "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next"
   },
   "devDependencies": {
-    "@dcl/sdk": "latest"
-  },
-  "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=6.0.0"
+    "@dcl/sdk": "next"
   },
   "prettier": {
     "semi": false,
     "singleQuote": true,
     "printWidth": 120,
     "trailingComma": "none"
-  }
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=6.0.0",
+    "yarn": "please use npm"
+  },
+  "dependencies": {
+    "@dcl/ui-scene-utils": "file:.."
+  },
+  "bundleDependencies": [
+    "@dcl/ui-scene-utils"
+  ]
 }

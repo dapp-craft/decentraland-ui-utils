@@ -6,7 +6,7 @@ import {
   InputAction,
   PointerEventType,
   Schemas,
-  inputSystem
+  inputSystem,
 } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { createCube } from './factory'
@@ -26,7 +26,7 @@ export function circularSystem(dt: number) {
 
     mutableTransform.rotation = Quaternion.multiply(
       mutableTransform.rotation,
-      Quaternion.fromAngleAxis(dt * 10, Vector3.Up())
+      Quaternion.fromAngleAxis(dt * 10, Vector3.Up()),
     )
   }
 }

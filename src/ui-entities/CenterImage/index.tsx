@@ -1,10 +1,10 @@
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
-import { UIObject, UIObjectConfig } from '../UIObject'
+import { DelayedHidingUIObject, DelayedHidingUIObjectConfig } from '../UIObject'
 
 import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
 
-type CenterImageConfig = UIObjectConfig & {
+type CenterImageConfig = DelayedHidingUIObjectConfig & {
   image: string;
   duration: number;
   width?: number;
@@ -29,7 +29,7 @@ const centerImageInitialConfig: Omit<Required<CenterImageConfig>, 'section'> = {
  *
  * @param {boolean} [startHidden=true] starting hidden
  * @param {string} image path to image file
- * @param {number} [duration=0] seconds to display the image onscreen. 0 keeps it on till you hide it
+ * @param {number} [duration=0] duration time to keep the image visible (in seconds) if starting visible
  * @param {number} [xOffset=0] offset on X
  * @param {number} [yOffset=0] offset on Y
  * @param {number} [width=512] image width
@@ -37,7 +37,7 @@ const centerImageInitialConfig: Omit<Required<CenterImageConfig>, 'section'> = {
  * @param {ImageAtlasData} section cut out a section of the image, as an object specifying atlasWidth, atlasHeight, sourceLeft, sourceTop, sourceWidth and sourceHeight
  *
  */
-export class CenterImage extends UIObject {
+export class CenterImage extends DelayedHidingUIObject {
   private readonly _image: string
   private readonly _xOffset: number
   private readonly _yOffset: number
@@ -49,14 +49,14 @@ export class CenterImage extends UIObject {
     {
       startHidden = centerImageInitialConfig.startHidden,
       image = centerImageInitialConfig.image,
-      // duration = centerImageInitialConfig.duration,
+      duration = centerImageInitialConfig.duration,
       width = centerImageInitialConfig.width,
       height = centerImageInitialConfig.height,
       xOffset = centerImageInitialConfig.xOffset,
       yOffset = centerImageInitialConfig.yOffset,
       section,
     }: CenterImageConfig) {
-    super({ startHidden })
+    super({ startHidden, duration })
 
     this._image = image
     this._width = width
@@ -66,9 +66,10 @@ export class CenterImage extends UIObject {
     if (section) this._section = section
   }
 
-  public render(): ReactEcs.JSX.Element {
+  public render(key?: string): ReactEcs.JSX.Element {
     return (
       <UiEntity
+        key={key}
         uiTransform={{
           display: this.visible ? 'flex' : 'none',
           width: this._width,

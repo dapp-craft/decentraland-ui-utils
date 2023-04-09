@@ -35,8 +35,10 @@ const promptSwitchInitialConfig: Required<PromptSwitchConfig> = {
   text: '',
   xPosition: 0,
   yPosition: 0,
-  onCheck: () => {},
-  onUncheck: () => {},
+  onCheck: () => {
+  },
+  onUncheck: () => {
+  },
   darkTheme: false,
   startChecked: false,
   style: PromptSwitchStyles.ROUNDGREEN,

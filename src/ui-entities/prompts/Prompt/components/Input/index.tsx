@@ -1,10 +1,11 @@
 import ReactEcs, { Input } from '@dcl/sdk/react-ecs'
 import { Color4 } from '@dcl/sdk/math'
 import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
+import { UiInputProps } from '@dcl/react-ecs/dist/components/Input/types'
 
 import { UIObject, UIObjectConfig } from '../../../../UIObject'
+
 import { defaultFont } from '../../../../../constants/font'
-import { UiInputProps } from '@dcl/react-ecs/dist/components/Input/types'
 
 export type PromptInputConfig = UIObjectConfig & {
   placeholder?: string | number;

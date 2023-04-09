@@ -17,29 +17,25 @@ export class Timer {
   }
 
   public start() {
-    console.log('this._timer=======================================================', this._timer)
-    console.log('this._seconds=====================================================', this._seconds)
-
     if (this._timer !== this._seconds) return
 
+    console.log('start timer_______________________________________________')
     engine.addSystem(this._timeOutSystemHandle)
   }
 
   public stop() {
     if (!this._callback) return
 
+    console.log('stop timer_______________________________________________')
     engine.removeSystem(this._timeOutSystemHandle)
 
     this._timer = this._seconds
   }
 
-  private _timeOutSystemHandle(dt: number) {
+  private _timeOutSystemHandle = (dt: number): void => {
     this._timer -= dt
 
-    console.log('dt--------------------------------------------------------------------', dt)
-
     if (this._timer <= 0) {
-      console.log('=====================================================================================')
 
       this._callback()
 

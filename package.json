@@ -1,26 +1,37 @@
 {
   "name": "@dcl/ui-scene-utils",
   "version": "0.0.0-development",
-  "description": "A collection of UI helpers to make it easier to build a Decentraland scene using the SDK.",
+  "description": "A collection of UI helpers to make it easier to build a Decentraland scene using the SDK 7.",
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "decentralandLibrary": {},
   "scripts": {
-    "semantic-release": "semantic-release",
-    "build": "rollup -c --environment BUILD:production",
-    "link": "npm link && rollup --watch -c --environment BUILD:production"
+    "build": "tsc -p tsconfig.json",
+    "watch": "npm link && tsc --watch -p tsconfig.json"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/decentraland/decentraland-ui-utils.git"
   },
-  "keywords": [],
+  "keywords": [
+    "Decentraland",
+    "sdk7",
+    "sdk 7",
+    "sdk ui utils",
+    "sdk library"
+  ],
   "author": "Decentraland",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/decentraland/decentraland-ui-utils/issues"
   },
   "homepage": "https://github.com/decentraland/decentraland-ui-utils#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=6.0.0",
@@ -28,21 +39,10 @@
   },
   "devDependencies": {
     "@dcl/sdk": "next",
-    "@rollup/plugin-commonjs": "^24.0.1",
-    "@rollup/plugin-node-resolve": "^13.3.0",
-    "@rollup/plugin-terser": "^0.4.0",
-    "@rollup/plugin-typescript": "^11.1.0",
-    "prettier": "^1.19.1",
-    "rollup": "^2.35.1",
-    "rollup-plugin-cleaner": "^1.0.0",
-    "semantic-release": "^16.0.1",
-    "tslib": "^2.5.0",
-    "typescript": "^4.9.5"
+    "prettier": "^2.8.7",
+    "typescript": "^4.9.3"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "files": [
-    "dist"
-  ]
+  "peerDependencies": {
+    "@dcl/sdk": "next"
+  }
 }

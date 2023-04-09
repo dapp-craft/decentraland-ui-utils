@@ -1,13 +1,11 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Label } from '@dcl/sdk/react-ecs'
 
-import { UIObject, UIObjectConfig } from '../UIObject'
-
-import { Timer } from '../../utils/timerUtils'
+import { DelayedHidingUIObject, DelayedHidingUIObjectConfig } from '../UIObject'
 
 import { defaultFont } from '../../constants/font'
 
-export type AnnouncementConfig = UIObjectConfig & {
+export type AnnouncementConfig = DelayedHidingUIObjectConfig & {
   value: string | number;
   duration?: number;
   xOffset?: number;
@@ -31,14 +29,14 @@ const announcementInitialConfig: Required<AnnouncementConfig> = {
  *
  * @param {boolean} [startHidden=true] starting hidden
  * @param {string | number} [value=''] starting value
- * @param {number} [duration=3] duration time to keep the text visible (in seconds)
+ * @param {number} [duration=3] duration time to keep the text visible (in seconds) if starting visible
  * @param {number} [xOffset=0] offset on X
  * @param {number} [yOffset=0] offset on Y
  * @param {Color4} [color=Color4.Yellow()] text color
  * @param {number} [size=50] text size
  *
  */
-export class Announcement extends UIObject {
+export class Announcement extends DelayedHidingUIObject {
   private readonly _value: string | number
   private readonly _xOffset: number
   private readonly _yOffset: number
@@ -55,24 +53,13 @@ export class Announcement extends UIObject {
       color = announcementInitialConfig.color,
       size = announcementInitialConfig.size,
     }: AnnouncementConfig) {
-    super({ startHidden })
+    super({ startHidden, duration })
 
     this._value = value
     this._xOffset = xOffset
     this._yOffset = yOffset
     this._color = color
     this._size = size
-
-    if (duration && this.visible) {
-      const timer = new Timer({
-        seconds: duration,
-        callback: () => {
-          console.log('end timer ====================================================================')
-        },
-      })
-
-      timer.start()
-    }
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
