@@ -23,8 +23,10 @@ const promptCheckbox = customPrompt.addCheckbox({
   xPosition: -80,
   yPosition: 50,
   onCheck: () => {
+    console.log('addCheckbox onCheck')
   },
   onUncheck: () => {
+    console.log('addCheckbox onUncheck')
   },
 })
 
@@ -33,8 +35,10 @@ const promptCheckbox = customPrompt.addCheckbox({
 //   xPosition: -60,
 //   yPosition: 0,
 //   onCheck: () => {
+//     console.log('addSwitch onCheck')
 //   },
 //   onUncheck: () => {
+//     console.log('addSwitch onUncheck')
 //   },
 // })
 
@@ -43,28 +47,31 @@ const promptTextBox = customPrompt.addTextBox({
   xPosition: 0,
   yPosition: 0,
   onChange: () => {
+    console.log('addTextBox onChange')
   },
 })
 
-const promptButtonY = customPrompt.addButton({
+const promptButtonE = customPrompt.addButton({
   style: ui.ButtonStyles.E,
   text: 'Yeah',
   xPosition: 0,
   yPosition: -60,
   onMouseDown: () => {
+    console.log('addButton onMouseDown')
   },
 })
 
-const promptButtonN = customPrompt.addButton({
+const promptButtonF = customPrompt.addButton({
   style: ui.ButtonStyles.F,
   text: 'Nope',
   xPosition: 0,
   yPosition: -120,
   onMouseDown: () => {
+    console.log('addButton onMouseDown')
   },
 })
 
-// customPrompt.addIcon({
+// const promptIcon = customPrompt.addIcon({
 //   image: 'images/scene-thumbnail.png',
 // })
 
