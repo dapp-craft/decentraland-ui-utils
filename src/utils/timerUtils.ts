@@ -6,36 +6,36 @@ export type TimerConfig = {
 }
 
 export class Timer {
+  private _endTime: number
   private readonly _seconds: number
   private readonly _callback: () => void
-  private _timer: number
 
   constructor({ seconds, callback }: TimerConfig) {
     this._seconds = seconds
+    this._endTime = this._seconds
     this._callback = callback
-    this._timer = this._seconds
   }
 
-  public start() {
-    if (this._timer !== this._seconds) return
+  public start(): void {
+    if (this._endTime !== this._seconds) return
 
-    console.log('start timer_______________________________________________')
+    console.log('start timer_________________')
     engine.addSystem(this._timeOutSystemHandle)
   }
 
-  public stop() {
-    if (!this._callback) return
+  public stop(): void {
+    if (this._endTime === this._seconds) return
 
-    console.log('stop timer_______________________________________________')
+    console.log('stop timer_________________')
     engine.removeSystem(this._timeOutSystemHandle)
 
-    this._timer = this._seconds
+    this._endTime = this._seconds
   }
 
   private _timeOutSystemHandle = (dt: number): void => {
-    this._timer -= dt
+    this._endTime -= dt
 
-    if (this._timer <= 0) {
+    if (this._endTime <= 0) {
 
       this._callback()
 

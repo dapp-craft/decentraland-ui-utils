@@ -1,7 +1,7 @@
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 import { Callback } from '@dcl/react-ecs/dist/components/listeners/types'
 
-import { UIObject, UIObjectConfig } from '../../../../UIObject'
+import { InPromptUIObject, InPromptUIObjectConfig } from '../../InPromptUIObject'
 
 import { getImageAtlasMapping, ImageAtlasData } from '../../../../../utils/imageUtils'
 
@@ -12,7 +12,7 @@ export enum PromptCloseIconStyles {
   CLOSED = `closeD`,
 }
 
-export type PromptCloseIconConfig = UIObjectConfig & {
+export type PromptCloseIconConfig = InPromptUIObjectConfig & {
   style: PromptCloseIconStyles;
   width?: number;
   height?: number;
@@ -23,6 +23,7 @@ export type PromptCloseIconConfig = UIObjectConfig & {
 
 const promptCloseIconInitialConfig: Required<PromptCloseIconConfig> = {
   startHidden: false,
+  promptVisible: false,
   style: PromptCloseIconStyles.CLOSED,
   width: 32,
   height: 32,
@@ -43,7 +44,7 @@ const promptCloseIconInitialConfig: Required<PromptCloseIconConfig> = {
  * @param {Callback} [onMouseDown=0] click action
  *
  */
-export class PromptCloseIcon extends UIObject {
+export class PromptCloseIcon extends InPromptUIObject {
   private readonly _section: ImageAtlasData
   private readonly _width: number
   private readonly _height: number
@@ -60,8 +61,9 @@ export class PromptCloseIcon extends UIObject {
       xPosition = promptCloseIconInitialConfig.xPosition,
       yPosition = promptCloseIconInitialConfig.yPosition,
       onMouseDown = promptCloseIconInitialConfig.onMouseDown,
+      promptVisible = promptCloseIconInitialConfig.promptVisible,
     }: PromptCloseIconConfig) {
-    super({ startHidden })
+    super({ startHidden: startHidden || !promptVisible, promptVisible })
 
     this._section = {
       ...sourcesComponentsCoordinates.icons[style],
@@ -81,7 +83,7 @@ export class PromptCloseIcon extends UIObject {
       <UiEntity
         key={key}
         uiTransform={{
-          display: this.visible ? 'flex' : 'none',
+          display: (this.visible && this._promptVisible) ? 'flex' : 'none',
           width: this._width,
           height: this._height,
           positionType: 'absolute',

@@ -3,11 +3,11 @@ import { Color4 } from '@dcl/sdk/math'
 import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
 import { UiInputProps } from '@dcl/react-ecs/dist/components/Input/types'
 
-import { UIObject, UIObjectConfig } from '../../../../UIObject'
+import { InPromptUIObject, InPromptUIObjectConfig } from '../../InPromptUIObject'
 
 import { defaultFont } from '../../../../../constants/font'
 
-export type PromptInputConfig = UIObjectConfig & {
+export type PromptInputConfig = InPromptUIObjectConfig & {
   placeholder?: string | number;
   xPosition: number;
   yPosition: number;
@@ -18,6 +18,7 @@ export type PromptInputConfig = UIObjectConfig & {
 
 const promptInputInitialConfig: Required<PromptInputConfig> = {
   startHidden: false,
+  promptVisible: false,
   placeholder: 'Fill in',
   xPosition: 0,
   yPosition: 0,
@@ -36,7 +37,7 @@ const promptInputInitialConfig: Required<PromptInputConfig> = {
  * @param {() => void} onChange Function to call every time the value in the text box is modified by the player
  *
  */
-export class PromptInput extends UIObject {
+export class PromptInput extends InPromptUIObject {
   public fillInBox: EntityPropTypes & Partial<UiInputProps>
   public currentText: string = ''
 
@@ -55,8 +56,9 @@ export class PromptInput extends UIObject {
       onChange = promptInputInitialConfig.onChange,
       promptWidth = promptInputInitialConfig.promptWidth,
       promptHeight = promptInputInitialConfig.promptHeight,
+      promptVisible = promptInputInitialConfig.promptVisible,
     }: PromptInputConfig) {
-    super({ startHidden })
+    super({ startHidden: startHidden || !promptVisible, promptVisible })
 
     this._width = 312
     this._height = 46
@@ -87,7 +89,7 @@ export class PromptInput extends UIObject {
         {...this.fillInBox}
         uiTransform={{
           ...this.fillInBox.uiTransform,
-          display: this.visible ? 'flex' : 'none',
+          display: (this.visible && this._promptVisible) ? 'flex' : 'none',
         }}
         onChange={this._onChange}
       />

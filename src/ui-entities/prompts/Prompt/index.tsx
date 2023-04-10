@@ -1,4 +1,4 @@
-import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
+import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 import { Callback } from '@dcl/react-ecs/dist/components/listeners/types'
 
 import { UIObject, UIObjectConfig } from '../../UIObject'
@@ -36,8 +36,7 @@ const promptInitialConfig: Required<PromptConfig> = {
   style: PromptStyles.LIGHT,
   width: 400,
   height: 250,
-  onClose: () => {
-  },
+  onClose: () => {},
 } as const
 
 /**
@@ -67,7 +66,7 @@ export class Prompt extends UIObject {
       width,
       height,
       onClose = promptInitialConfig.onClose,
-    }: PromptConfig) {
+    }: PromptConfig | undefined = {}) {
     super({ startHidden })
 
     this._style = style
@@ -82,6 +81,7 @@ export class Prompt extends UIObject {
     }
 
     this._closeIconData = {
+      promptVisible: this.visible,
       width: 32,
       height: 32,
       style: PromptCloseIconStyles.CLOSED,
@@ -98,9 +98,28 @@ export class Prompt extends UIObject {
     this._isDarkTheme = this._texture !== AtlasTheme.ATLAS_PATH_LIGHT
   }
 
-  public addTextBox(config: Omit<Omit<PromptInputConfig, 'promptHeight'>, 'promptWidth'>): PromptInput {
+  public show() {
+    super.show()
+
+    this._components.forEach((component) => {
+      component.changedPromptVisible(true)
+      component.show()
+    })
+  }
+
+  public hide() {
+    super.hide()
+
+    this._components.forEach((component) => {
+      component.changedPromptVisible(false)
+      component.hide()
+    })
+  }
+
+  public addTextBox(config: Omit<PromptInputConfig, 'promptHeight' | 'promptWidth' | 'promptVisible'>): PromptInput {
     const uiInput = new PromptInput({
       ...config,
+      promptVisible: this.visible,
       promptWidth: this._width,
       promptHeight: this._height,
     })
@@ -110,10 +129,11 @@ export class Prompt extends UIObject {
     return uiInput
   }
 
-  public addSwitch(config: Omit<Omit<PromptSwitchConfig, 'promptHeight'>, 'promptWidth'>): PromptSwitch {
+  public addSwitch(config: Omit<PromptSwitchConfig, 'promptHeight' | 'promptWidth' | 'promptVisible'>): PromptSwitch {
     const uiSwitch = new PromptSwitch(
       {
         ...config,
+        promptVisible: this.visible,
         promptWidth: this._width,
         promptHeight: this._height,
         darkTheme: this._isDarkTheme,
@@ -125,10 +145,11 @@ export class Prompt extends UIObject {
     return uiSwitch
   }
 
-  public addCheckbox(config: Omit<Omit<PromptCheckboxConfig, 'promptHeight'>, 'promptWidth'>): PromptCheckbox {
+  public addCheckbox(config: Omit<PromptCheckboxConfig, 'promptHeight' | 'promptWidth' | 'promptVisible'>): PromptCheckbox {
     const uiCheckbox = new PromptCheckbox(
       {
         ...config,
+        promptVisible: this.visible,
         promptWidth: this._width,
         promptHeight: this._height,
         darkTheme: this._isDarkTheme,
@@ -140,10 +161,11 @@ export class Prompt extends UIObject {
     return uiCheckbox
   }
 
-  public addButton(config: Omit<Omit<PromptButtonConfig, 'promptHeight'>, 'promptWidth'>): PromptButton {
+  public addButton(config: Omit<PromptButtonConfig, 'promptHeight' | 'promptWidth' | 'promptVisible'>): PromptButton {
     const uiButton = new PromptButton(
       {
         ...config,
+        promptVisible: this.visible,
         promptWidth: this._width,
         promptHeight: this._height,
       },
@@ -154,19 +176,26 @@ export class Prompt extends UIObject {
     return uiButton
   }
 
-  public addText(config: Omit<PromptTextConfig, 'darkTheme'>): PromptText {
-    const uiText = new PromptText({ ...config, darkTheme: this._isDarkTheme })
+  public addText(config: Omit<PromptTextConfig, 'darkTheme' | 'promptVisible'>): PromptText {
+    const uiText = new PromptText(
+      {
+        ...config,
+        promptVisible: this.visible,
+        darkTheme: this._isDarkTheme,
+      },
+    )
 
     this._components.push(uiText)
 
     return uiText
   }
 
-  public addIcon(config: PromptIconConfig): PromptIcon {
+  public addIcon(config: Omit<PromptIconConfig, 'promptHeight' | 'promptWidth' | 'promptVisible'>): PromptIcon {
     const uiIcon = new PromptIcon({
       ...config,
-      xOffset: this._width / -2 + (config.width || 128) / 2 + (config.xOffset || 0),
-      yOffset: this._height / 2 + (config.height || 128) / -2 + (config.yOffset || 0),
+      promptVisible: this.visible,
+      promptWidth: this._width,
+      promptHeight: this._height,
     })
 
     this._components.push(uiIcon)

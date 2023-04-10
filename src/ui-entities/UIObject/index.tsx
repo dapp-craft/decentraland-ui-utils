@@ -83,8 +83,8 @@ export abstract class DelayedHidingUIObject extends UIObject {
 
     this._timer = new Timer({
       seconds: duration,
-      callback: () => {
-        console.log('end timer_______________________________________________')
+      callback: (): void => {
+        console.log('end timer callback_________________')
         this.hide()
       },
     })

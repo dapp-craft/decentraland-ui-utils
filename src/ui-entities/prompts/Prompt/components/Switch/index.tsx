@@ -3,7 +3,7 @@ import { Color4 } from '@dcl/sdk/math'
 import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
 import { UiLabelProps } from '@dcl/react-ecs/dist/components/Label/types'
 
-import { UIObject, UIObjectConfig } from '../../../../UIObject'
+import { InPromptUIObject, InPromptUIObjectConfig } from '../../InPromptUIObject'
 
 import { getImageAtlasMapping } from '../../../../../utils/imageUtils'
 
@@ -17,7 +17,7 @@ export enum PromptSwitchStyles {
   SQUARERED = `squareRed`
 }
 
-export type PromptSwitchConfig = UIObjectConfig & {
+export type PromptSwitchConfig = InPromptUIObjectConfig & {
   text: string | number;
   xPosition: number;
   yPosition: number;
@@ -32,6 +32,7 @@ export type PromptSwitchConfig = UIObjectConfig & {
 
 const promptSwitchInitialConfig: Required<PromptSwitchConfig> = {
   startHidden: false,
+  promptVisible: false,
   text: '',
   xPosition: 0,
   yPosition: 0,
@@ -57,7 +58,7 @@ const promptSwitchInitialConfig: Required<PromptSwitchConfig> = {
  * @param {boolean} [startChecked=false] Starts the checkbox in a default state of already checked
  *
  */
-export class PromptSwitch extends UIObject {
+export class PromptSwitch extends InPromptUIObject {
   public image: EntityPropTypes
   public label: EntityPropTypes & UiLabelProps
 
@@ -81,8 +82,9 @@ export class PromptSwitch extends UIObject {
       style = promptSwitchInitialConfig.style,
       promptWidth = promptSwitchInitialConfig.promptWidth,
       promptHeight = promptSwitchInitialConfig.promptHeight,
+      promptVisible = promptSwitchInitialConfig.promptVisible,
     }: PromptSwitchConfig) {
-    super({ startHidden })
+    super({ startHidden: startHidden || !promptVisible, promptVisible })
 
     this._checked = startChecked
 
@@ -141,7 +143,7 @@ export class PromptSwitch extends UIObject {
       <UiEntity
         key={key}
         uiTransform={{
-          display: this.visible ? 'flex' : 'none',
+          display: (this.visible && this._promptVisible) ? 'flex' : 'none',
           width: '100%',
           height: 32,
           flexDirection: 'row',

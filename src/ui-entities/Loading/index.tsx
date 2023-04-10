@@ -11,7 +11,7 @@ type LoadingConfig = DelayedHidingUIObjectConfig & {
   xOffset?: number;
   yOffset?: number;
   scale?: number;
-} | undefined
+}
 
 type LoadingSizeConfig = {
   width: number;
@@ -52,7 +52,7 @@ export class Loading extends DelayedHidingUIObject {
       xOffset = loadingInitialConfig.xOffset,
       yOffset = loadingInitialConfig.yOffset,
       scale = loadingInitialConfig.scale,
-    }: LoadingConfig = {}) {
+    }: LoadingConfig | undefined = {}) {
     super({ startHidden, duration })
 
     this._width = loadingInitialConfig.width * scale

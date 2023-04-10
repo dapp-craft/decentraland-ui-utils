@@ -3,14 +3,14 @@ import { Color4 } from '@dcl/sdk/math'
 import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
 import { UiLabelProps } from '@dcl/react-ecs/dist/components/Label/types'
 
-import { UIObject, UIObjectConfig } from '../../../../UIObject'
+import { InPromptUIObject, InPromptUIObjectConfig } from '../../InPromptUIObject'
 
 import { getImageAtlasMapping } from '../../../../../utils/imageUtils'
 
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../../constants/resources'
 import { defaultFont } from '../../../../../constants/font'
 
-export type PromptCheckboxConfig = UIObjectConfig & {
+export type PromptCheckboxConfig = InPromptUIObjectConfig & {
   text: string | number;
   xPosition: number;
   yPosition: number;
@@ -25,6 +25,7 @@ export type PromptCheckboxConfig = UIObjectConfig & {
 
 const promptCheckboxInitialConfig: Required<PromptCheckboxConfig> = {
   startHidden: false,
+  promptVisible: false,
   text: '',
   xPosition: 0,
   yPosition: 0,
@@ -51,7 +52,7 @@ const promptCheckboxInitialConfig: Required<PromptCheckboxConfig> = {
  * @param {boolean} [startChecked=false] Starts the checkbox in a default state of already checked
  *
  */
-export class PromptCheckbox extends UIObject {
+export class PromptCheckbox extends InPromptUIObject {
   public image: EntityPropTypes
   public label: EntityPropTypes & UiLabelProps
 
@@ -76,8 +77,9 @@ export class PromptCheckbox extends UIObject {
       darkTheme = promptCheckboxInitialConfig.darkTheme,
       promptWidth = promptCheckboxInitialConfig.promptWidth,
       promptHeight = promptCheckboxInitialConfig.promptHeight,
+      promptVisible = promptCheckboxInitialConfig.promptVisible,
     }: PromptCheckboxConfig) {
-    super({ startHidden })
+    super({ startHidden: startHidden || !promptVisible, promptVisible })
 
     this._checked = startChecked
     this._darkTheme = darkTheme
@@ -137,7 +139,7 @@ export class PromptCheckbox extends UIObject {
       <UiEntity
         key={key}
         uiTransform={{
-          display: this.visible ? 'flex' : 'none',
+          display: (this.visible && this._promptVisible) ? 'flex' : 'none',
           width: '100%',
           height: 32,
           flexDirection: 'row',
