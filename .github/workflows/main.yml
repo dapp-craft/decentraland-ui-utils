@@ -27,12 +27,12 @@ jobs:
       - name: install dependencies demo
         working-directory: ./demo
         run: npm i
-      - name: build demo
-        working-directory: ./demo
-        run: npm run build
       - name: link demo
         working-directory: ./demo
         run: npm link @dcl/ui-scene-utils
+      - name: build demo
+        working-directory: ./demo
+        run: npm run build
       - name: deploy demo
         working-directory: ./demo
         env: 
