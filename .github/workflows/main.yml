@@ -1,0 +1,40 @@
+name: build
+
+on:
+  push:
+    branches:
+    - develop
+
+jobs:
+  build-and-deploy-to-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: install decentraland
+        run: npm i -g decentraland@latest
+      - name: install dependencies
+        run: npm i
+#       - name: lint
+#         run: npm run lint
+      - name: build
+        run: npm run build
+      - name: link
+        run: npm run link
+      - name: install dependencies demo
+        working-directory: ./demo
+        run: npm i
+      - name: build demo
+        working-directory: ./demo
+        run: npm run build
+      - name: link demo
+        working-directory: ./demo
+        run: npm link @dcl/ui-scene-utils
+      - name: deploy demo
+        working-directory: ./demo
+        env: 
+          DCL_PRIVATE_KEY: ${{ secrets.DEPLOY_PKEY }}
+        run: npm run deploy
