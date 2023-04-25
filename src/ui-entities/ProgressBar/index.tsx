@@ -1,9 +1,10 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
 
 import { UIObject, UIObjectConfig } from '../UIObject'
 
-import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
+import { getImageAtlasMapping } from '../../utils/imageUtils'
 
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../constants/resources'
 
@@ -50,28 +51,30 @@ const progressBarInitialConfig: Required<ProgressBarConfig> = {
  *
  */
 export class ProgressBar extends UIObject {
+  public barElement: EntityPropTypes
+  public backgroundElement: EntityPropTypes
+  public processElement: EntityPropTypes
+
+  public scale: number
+  public xOffset: number
+  public yOffset: number
+  public color: Color4
+  public style: BarStyles
+
   private _value: number
-  private readonly _scale: number
-  private readonly _color: Color4
-  private readonly _xOffset: number
-  private readonly _yOffset: number
-  private readonly _style: BarStyles
 
   private readonly _valueMax: number
   private readonly _valueMin: number
   private readonly _valueChangeStep: number
 
-  private readonly _width: number
-  private readonly _height: number
+  private _width: number | undefined
+  private _height: number | undefined
 
-  private readonly _progressWidth: number
-  private readonly _progressHeight: number
-  private readonly _progressPaddingTop: number
-  private readonly _progressPaddingBottom: number
-  private readonly _progressPaddingLeft: number
-  private readonly _progressPaddingRight: number
-
-  private readonly _section: ImageAtlasData
+  private _progressHeight: number | undefined
+  private _progressPaddingTop: number | undefined
+  private _progressPaddingBottom: number | undefined
+  private _progressPaddingLeft: number | undefined
+  private _progressPaddingRight: number | undefined
 
   constructor(
     {
@@ -85,38 +88,47 @@ export class ProgressBar extends UIObject {
     }: ProgressBarConfig) {
     super({ startHidden })
 
+    this.scale = scale
+    this.color = color
+    this.xOffset = xOffset
+    this.yOffset = yOffset
+    this.style = style
+
     this._value = value
-    this._scale = scale
-    this._color = color
-    this._xOffset = xOffset
-    this._yOffset = yOffset
-    this._style = style
 
     this._valueMax = 1
     this._valueMin = 0
     this._valueChangeStep = 0.1
 
-    this._width = 128 * this._scale
-    this._height = 32 * this._scale
+    this.barElement = {
+      uiTransform: {
+        positionType: 'absolute',
+      },
+    }
 
-    const isNotDefaultBorders = (
-      this._style === BarStyles.ROUNDWHITE ||
-      this._style === BarStyles.ROUNDBLACK ||
-      this._style === BarStyles.SQUAREWHITE ||
-      this._style === BarStyles.SQUAREBLACK
-    )
+    this.backgroundElement = {
+      uiTransform: {
+        width: '100%',
+        height: '100%',
+      },
+      uiBackground: {
+        textureMode: 'stretch',
+        texture: {
+          src: AtlasTheme.ATLAS_PATH_LIGHT,
+        },
+      },
+    }
 
-    this._progressPaddingTop = (isNotDefaultBorders ? 3 : 2) * this._scale
-    this._progressPaddingBottom = (isNotDefaultBorders ? 3 : 4) * this._scale
-    this._progressPaddingLeft = (isNotDefaultBorders ? 3 : 2) * this._scale
-    this._progressPaddingRight = (isNotDefaultBorders ? 3 : 2) * this._scale
-    this._progressWidth = this._width * this._value - this._progressPaddingLeft - this._progressPaddingRight
-    this._progressHeight = this._height - this._progressPaddingTop - this._progressPaddingBottom
-
-    this._section = {
-      ...sourcesComponentsCoordinates.buttons[this._style],
-      atlasHeight: sourcesComponentsCoordinates.atlasHeight,
-      atlasWidth: sourcesComponentsCoordinates.atlasWidth,
+    this.processElement = {
+      uiTransform: {
+        positionType: 'absolute',
+      },
+      uiBackground: {
+        textureMode: 'stretch',
+        texture: {
+          src: AtlasTheme.ATLAS_PATH_LIGHT,
+        },
+      },
     }
   }
 
@@ -160,48 +172,61 @@ export class ProgressBar extends UIObject {
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
+    this._width = 128 * this.scale
+    this._height = 32 * this.scale
+
+    const isNotDefaultBorders = (
+      this.style === BarStyles.ROUNDWHITE ||
+      this.style === BarStyles.ROUNDBLACK ||
+      this.style === BarStyles.SQUAREWHITE ||
+      this.style === BarStyles.SQUAREBLACK
+    )
+
+    this._progressPaddingTop = (isNotDefaultBorders ? 3 : 2) * this.scale
+    this._progressPaddingBottom = (isNotDefaultBorders ? 3 : 4) * this.scale
+    this._progressPaddingLeft = (isNotDefaultBorders ? 3 : 2) * this.scale
+    this._progressPaddingRight = (isNotDefaultBorders ? 3 : 2) * this.scale
+    this._progressHeight = this._height - this._progressPaddingTop - this._progressPaddingBottom
+
     return (
       <UiEntity
         key={key}
+        {...this.barElement}
         uiTransform={{
+          ...this.barElement.uiTransform,
           display: this.visible ? 'flex' : 'none',
+          position: { bottom: this.yOffset, right: this.xOffset * -1 },
           width: this._width,
           height: this._height,
-          positionType: 'absolute',
-          position: { bottom: this._yOffset, right: this._xOffset * -1 },
         }}
       >
         <UiEntity
-          uiTransform={{
-            width: '100%',
-            height: '100%',
-          }}
+          {...this.backgroundElement}
           uiBackground={{
-            textureMode: 'stretch',
-            texture: {
-              src: AtlasTheme.ATLAS_PATH_LIGHT,
-            },
-            uvs: getImageAtlasMapping(this._section),
+            ...this.backgroundElement.uiBackground,
+            uvs: getImageAtlasMapping({
+              ...sourcesComponentsCoordinates.buttons[this.style],
+              atlasHeight: sourcesComponentsCoordinates.atlasHeight,
+              atlasWidth: sourcesComponentsCoordinates.atlasWidth,
+            }),
           }}
         />
         <UiEntity
+          {...this.processElement}
           uiTransform={{
-            width: this._progressWidth,
+            ...this.processElement.uiTransform,
+            width: this._width * this._value - this._progressPaddingLeft - this._progressPaddingRight,
             height: this._progressHeight,
-            positionType: 'absolute',
             position: {
               top: this._progressPaddingTop,
               left: this._progressPaddingLeft,
             },
           }}
           uiBackground={{
-            color: this._color,
-            textureMode: 'stretch',
-            texture: {
-              src: AtlasTheme.ATLAS_PATH_LIGHT,
-            },
+            ...this.processElement.uiBackground,
+            color: this.color,
             uvs: getImageAtlasMapping({
-              ...sourcesComponentsCoordinates.buttons[this._style.startsWith('round') ? 'roundWhite' : 'squareWhite'],
+              ...sourcesComponentsCoordinates.buttons[this.style.startsWith('round') ? 'roundWhite' : 'squareWhite'],
               atlasHeight: sourcesComponentsCoordinates.atlasHeight,
               atlasWidth: sourcesComponentsCoordinates.atlasWidth,
             }),

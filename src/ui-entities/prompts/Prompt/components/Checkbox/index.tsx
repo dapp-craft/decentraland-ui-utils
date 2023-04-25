@@ -25,25 +25,23 @@ export type PromptCheckboxConfig = InPromptUIObjectConfig & {
 
 const promptCheckboxInitialConfig: Required<PromptCheckboxConfig> = {
   startHidden: false,
-  promptVisible: false,
   text: '',
   xPosition: 0,
   yPosition: 0,
-  onCheck: () => {
-  },
-  onUncheck: () => {
-  },
+  onCheck: () => {},
+  onUncheck: () => {},
   large: false,
-  darkTheme: false,
   startChecked: false,
+  promptVisible: false,
   promptWidth: 400,
   promptHeight: 250,
+  darkTheme: false,
 } as const
 
 /**
  * Prompt checkbox
  * @param {boolean} [startHidden=false] starting hidden
- * @param {string} [label=''] Text to display on the right of the box
+ * @param {string} [text=''] Text to display on the right of the box
  * @param {number} [xPosition=0] Position on X on the prompt, counting from the center of the prompt
  * @param {number} [yPosition=0] Position on Y on the prompt, counting from the center of the prompt
  * @param {() => void} onCheck Function to call every time the box is checked
@@ -53,16 +51,20 @@ const promptCheckboxInitialConfig: Required<PromptCheckboxConfig> = {
  *
  */
 export class PromptCheckbox extends InPromptUIObject {
-  public image: EntityPropTypes
-  public label: EntityPropTypes & UiLabelProps
+  public imageElement: EntityPropTypes
+  public labelElement: EntityPropTypes & UiLabelProps
+
+  public text: string | number
+  public xPosition: number
+  public yPosition: number
+  public large: boolean
+  public startChecked: boolean
+  public onUncheck: () => void
+  public onCheck: () => void
 
   private _checked: boolean
-  private readonly _xPosition: number
-  private readonly _yPosition: number
-  private readonly _darkTheme: boolean
-  private readonly _large: boolean
-  private readonly _onCheck: () => void
-  private readonly _onUncheck: () => void
+  private _xPosition: number | undefined
+  private _yPosition: number | undefined
 
   constructor(
     {
@@ -70,31 +72,32 @@ export class PromptCheckbox extends InPromptUIObject {
       text = promptCheckboxInitialConfig.text,
       xPosition = promptCheckboxInitialConfig.xPosition,
       yPosition = promptCheckboxInitialConfig.yPosition,
-      onCheck = promptCheckboxInitialConfig.onCheck,
-      onUncheck = promptCheckboxInitialConfig.onUncheck,
       large = promptCheckboxInitialConfig.large,
-      startChecked = promptCheckboxInitialConfig.startChecked,
       darkTheme = promptCheckboxInitialConfig.darkTheme,
+      startChecked = promptCheckboxInitialConfig.startChecked,
+      onUncheck = promptCheckboxInitialConfig.onUncheck,
+      onCheck = promptCheckboxInitialConfig.onCheck,
       promptWidth = promptCheckboxInitialConfig.promptWidth,
       promptHeight = promptCheckboxInitialConfig.promptHeight,
       promptVisible = promptCheckboxInitialConfig.promptVisible,
     }: PromptCheckboxConfig) {
-    super({ startHidden: startHidden || !promptVisible, promptVisible })
+    super({ startHidden: startHidden || !promptVisible, promptVisible, promptWidth, promptHeight, darkTheme })
 
-    this._checked = startChecked
-    this._darkTheme = darkTheme
-    this._large = large
+    this.text = text
+    this.xPosition = xPosition
+    this.yPosition = yPosition
+    this.large = large
+    this.startChecked = startChecked
+    this.onUncheck = onUncheck
+    this.onCheck = onCheck
 
-    this._onCheck = onCheck
-    this._onUncheck = onUncheck
+    this._checked = this.startChecked
 
-    this._xPosition = (promptWidth / -2) + (promptWidth / 2) + xPosition
-    this._yPosition = (promptHeight / 2) + (32 / -2) + yPosition
+    this.onCheck = onCheck
+    this.onUncheck = onUncheck
 
-    this.image = {
+    this.imageElement = {
       uiTransform: {
-        width: this._large ? 32 : 24,
-        height: this._large ? 32 : 24,
         margin: {
           right: 5,
         },
@@ -107,15 +110,14 @@ export class PromptCheckbox extends InPromptUIObject {
       },
     }
 
-    this.label = {
-      value: String(text),
+    this.labelElement = {
+      value: String(this.text),
       uiTransform: {
         maxWidth: '100%',
         height: '100%',
       },
       textAlign: 'middle-left',
       font: defaultFont,
-      color: darkTheme ? Color4.White() : Color4.Black(),
       fontSize: 20,
     }
   }
@@ -135,11 +137,14 @@ export class PromptCheckbox extends InPromptUIObject {
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
+    this._xPosition = (this.promptWidth / -2) + (this.promptWidth / 2) + this.xPosition
+    this._yPosition = (this.promptHeight / 2) + (32 / -2) + this.yPosition
+
     return (
       <UiEntity
         key={key}
         uiTransform={{
-          display: (this.visible && this._promptVisible) ? 'flex' : 'none',
+          display: (this.visible && this.promptVisible) ? 'flex' : 'none',
           width: '100%',
           height: 32,
           flexDirection: 'row',
@@ -150,30 +155,40 @@ export class PromptCheckbox extends InPromptUIObject {
         }}
       >
         <UiEntity
-          {...this.image}
+          {...this.imageElement}
           uiBackground={{
-            ...this.image.uiBackground, uvs: getImageAtlasMapping({
+            ...this.imageElement.uiBackground,
+            uvs: getImageAtlasMapping({
               ...sourcesComponentsCoordinates.checkboxes[this._getImageStyle()],
               atlasHeight: sourcesComponentsCoordinates.atlasHeight,
               atlasWidth: sourcesComponentsCoordinates.atlasWidth,
             }),
           }}
+          uiTransform={{
+            ...this.imageElement.uiTransform,
+            width: this.large ? 32 : 24,
+            height: this.large ? 32 : 24,
+          }}
           onMouseDown={this._click}
         />
-        <Label{...this.label} />
+        <Label
+          {...this.labelElement}
+          value={String(this.text)}
+          color={this.labelElement.color || this.darkTheme ? Color4.White() : Color4.Black()}
+        />
       </UiEntity>
     )
   }
 
   private _getImageStyle(): 'wLargeOff' | 'wLargeOn' | 'wOff' | 'wOn' | 'dLargeOff' | 'dLargeOn' | 'dOff' | 'dOn' {
-    if (this._darkTheme) {
-      if (this._large) {
+    if (this.darkTheme) {
+      if (this.large) {
         return !this._checked ? 'wLargeOff' : 'wLargeOn'
       } else {
         return !this._checked ? 'wOff' : 'wOn'
       }
     } else {
-      if (this._large) {
+      if (this.large) {
         return !this._checked ? 'dLargeOff' : 'dLargeOn'
       } else {
         return !this._checked ? 'dOff' : 'dOn'
@@ -184,10 +199,10 @@ export class PromptCheckbox extends InPromptUIObject {
   private _click = (): void => {
     if (!this._checked) {
       this.check()
-      this._onCheck()
+      this.onCheck()
     } else {
       this.uncheck()
-      this._onUncheck()
+      this.onUncheck()
     }
   }
 }

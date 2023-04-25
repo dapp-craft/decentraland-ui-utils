@@ -1,10 +1,11 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
+import { Callback } from '@dcl/react-ecs/dist/components/listeners/types'
 
-import { UIObjectConfig } from '../../UIObject'
-import { Prompt, PromptStyles } from '../Prompt'
-import { PromptButtonStyles } from '../Prompt/components/Button'
+import { Prompt, PromptExternalConfig, PromptStyles } from '../Prompt'
+import { PromptButton, PromptButtonStyles } from '../Prompt/components/Button'
+import { PromptText } from '../Prompt/components/Text'
 
-type OptionPromptConfig = UIObjectConfig & {
+type OptionPromptConfig = PromptExternalConfig & {
   title: string | number;
   titleSize?: number;
   text: string | number;
@@ -21,7 +22,7 @@ type OptionPromptSizeConfig = {
   height?: number;
 }
 
-const okPromptInitialConfig: Required<OptionPromptConfig & OptionPromptSizeConfig> = {
+const optionPromptInitialConfig: Required<OptionPromptConfig & OptionPromptSizeConfig> = {
   startHidden: true,
   title: '',
   titleSize: 24,
@@ -30,17 +31,21 @@ const okPromptInitialConfig: Required<OptionPromptConfig & OptionPromptSizeConfi
   useDarkTheme: false,
   acceptLabel: 'Yes',
   rejectLabel: 'No',
+  width: 480,
+  height: 384,
   onAccept: () => {
   },
   onReject: () => {
   },
-  width: 480,
-  height: 384,
+  onClose: () => {
+  },
 } as const
 
 /**
  * Displays a loading icon in the center of the screen
  * @param {boolean} [startHidden=true] starting hidden
+ * @param {number} width background width
+ * @param {number} height background height
  * @param {string | number} [title=''] header on dialog
  * @param {number} [titleSize=24] header text size
  * @param {string | number} [text=''] smaller print instructions
@@ -50,45 +55,53 @@ const okPromptInitialConfig: Required<OptionPromptConfig & OptionPromptSizeConfi
  * @param {string} [rejectLabel='No'] string to go in the reject button
  * @param {() => void} onAccept function that gets executed if player clicks button
  * @param {() => void} onReject function that gets executed if player clicks reject
+ * @param {Callback} onClose callback on prompt close
  *
  */
 export class OptionPrompt extends Prompt {
+  public titleElement: PromptText
+  public textElement: PromptText
+  public primaryButtonElement: PromptButton
+  public secondaryButtonElement: PromptButton
+
   constructor(
     {
-      startHidden = okPromptInitialConfig.startHidden,
-      title = okPromptInitialConfig.title,
-      titleSize = okPromptInitialConfig.titleSize,
-      text = okPromptInitialConfig.text,
-      textSize = okPromptInitialConfig.textSize,
-      useDarkTheme = okPromptInitialConfig.useDarkTheme,
-      acceptLabel = okPromptInitialConfig.acceptLabel,
-      rejectLabel = okPromptInitialConfig.rejectLabel,
-      onAccept = okPromptInitialConfig.onAccept,
-      onReject = okPromptInitialConfig.onReject,
+      startHidden = optionPromptInitialConfig.startHidden,
+      title = optionPromptInitialConfig.title,
+      titleSize = optionPromptInitialConfig.titleSize,
+      text = optionPromptInitialConfig.text,
+      textSize = optionPromptInitialConfig.textSize,
+      useDarkTheme = optionPromptInitialConfig.useDarkTheme,
+      acceptLabel = optionPromptInitialConfig.acceptLabel,
+      rejectLabel = optionPromptInitialConfig.rejectLabel,
+      onAccept = optionPromptInitialConfig.onAccept,
+      onReject = optionPromptInitialConfig.onReject,
+      onClose = optionPromptInitialConfig.onClose,
     }: OptionPromptConfig) {
     super(
       {
         startHidden,
         style: useDarkTheme ? PromptStyles.DARK : PromptStyles.LIGHT,
-        width: okPromptInitialConfig.width,
-        height: okPromptInitialConfig.height,
+        width: optionPromptInitialConfig.width,
+        height: optionPromptInitialConfig.height,
+        onClose,
       })
 
-    this.addText({
+    this.titleElement = this.addText({
       value: String(title),
       xPosition: 0,
       yPosition: 160,
       size: titleSize,
     })
 
-    this.addText({
+    this.textElement = this.addText({
       value: String(text),
       xPosition: 0,
       yPosition: 40,
       size: textSize,
     })
 
-    this.addButton({
+    this.primaryButtonElement = this.addButton({
       text: String(acceptLabel),
       xPosition: -100,
       yPosition: -120,
@@ -96,7 +109,7 @@ export class OptionPrompt extends Prompt {
       style: PromptButtonStyles.E,
     })
 
-    this.addButton({
+    this.secondaryButtonElement = this.addButton({
       text: String(rejectLabel),
       xPosition: 100,
       yPosition: -120,

@@ -26,13 +26,10 @@ export type PromptSwitchConfig = InPromptUIObjectConfig & {
   darkTheme?: boolean;
   startChecked?: boolean;
   style?: PromptSwitchStyles;
-  promptWidth: number;
-  promptHeight: number;
 }
 
 const promptSwitchInitialConfig: Required<PromptSwitchConfig> = {
   startHidden: false,
-  promptVisible: false,
   text: '',
   xPosition: 0,
   yPosition: 0,
@@ -40,17 +37,18 @@ const promptSwitchInitialConfig: Required<PromptSwitchConfig> = {
   },
   onUncheck: () => {
   },
-  darkTheme: false,
   startChecked: false,
   style: PromptSwitchStyles.ROUNDGREEN,
+  promptVisible: false,
   promptWidth: 400,
   promptHeight: 250,
+  darkTheme: false,
 } as const
 
 /**
  * Prompt switch
  * @param {boolean} [startHidden=false] starting hidden
- * @param {string} [label=''] Text to display on the right of the box
+ * @param {string} [text=''] Text to display on the right of the box
  * @param {number} [xPosition=0] Position on X on the prompt, counting from the center of the prompt
  * @param {number} [yPosition=0] Position on Y on the prompt, counting from the center of the prompt
  * @param {() => void} onCheck Function to call every time the box is checked
@@ -59,15 +57,20 @@ const promptSwitchInitialConfig: Required<PromptSwitchConfig> = {
  *
  */
 export class PromptSwitch extends InPromptUIObject {
-  public image: EntityPropTypes
-  public label: EntityPropTypes & UiLabelProps
+  public imageElement: EntityPropTypes
+  public labelElement: EntityPropTypes & UiLabelProps
+
+  public text: string | number
+  public xPosition: number
+  public yPosition: number
+  public style: PromptSwitchStyles
+  public startChecked: boolean
+  public onUncheck: () => void
+  public onCheck: () => void
 
   private _checked: boolean
-  private readonly _xPosition: number
-  private readonly _yPosition: number
-  private readonly _style: PromptSwitchStyles
-  private readonly _onCheck: () => void
-  private readonly _onUncheck: () => void
+  private _xPosition: number | undefined
+  private _yPosition: number | undefined
 
   constructor(
     {
@@ -84,18 +87,19 @@ export class PromptSwitch extends InPromptUIObject {
       promptHeight = promptSwitchInitialConfig.promptHeight,
       promptVisible = promptSwitchInitialConfig.promptVisible,
     }: PromptSwitchConfig) {
-    super({ startHidden: startHidden || !promptVisible, promptVisible })
+    super({ startHidden: startHidden || !promptVisible, promptVisible, promptWidth, promptHeight, darkTheme })
+
+    this.text = text
+    this.xPosition = xPosition
+    this.yPosition = yPosition
+    this.style = style
+    this.startChecked = startChecked
+    this.onUncheck = onUncheck
+    this.onCheck = onCheck
 
     this._checked = startChecked
 
-    this._onCheck = onCheck
-    this._onUncheck = onUncheck
-    this._style = style
-
-    this._xPosition = (promptWidth / -2) + (promptWidth / 2) + xPosition
-    this._yPosition = (promptHeight / 2) + (32 / -2) + yPosition
-
-    this.image = {
+    this.imageElement = {
       uiTransform: {
         width: 64,
         height: 32,
@@ -111,15 +115,14 @@ export class PromptSwitch extends InPromptUIObject {
       },
     }
 
-    this.label = {
-      value: String(text),
+    this.labelElement = {
+      value: String(this.text),
       uiTransform: {
         maxWidth: '100%',
         height: '100%',
       },
       textAlign: 'middle-left',
       font: defaultFont,
-      color: darkTheme ? Color4.White() : Color4.Black(),
       fontSize: 20,
     }
   }
@@ -139,11 +142,14 @@ export class PromptSwitch extends InPromptUIObject {
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
+    this._xPosition = (this.promptWidth / -2) + (this.promptWidth / 2) + this.xPosition
+    this._yPosition = (this.promptHeight / 2) + (32 / -2) + this.yPosition
+
     return (
       <UiEntity
         key={key}
         uiTransform={{
-          display: (this.visible && this._promptVisible) ? 'flex' : 'none',
+          display: (this.visible && this.promptVisible) ? 'flex' : 'none',
           width: '100%',
           height: 32,
           flexDirection: 'row',
@@ -155,25 +161,29 @@ export class PromptSwitch extends InPromptUIObject {
         onMouseDown={this._click}
       >
         <UiEntity
-          {...this.image}
+          {...this.imageElement}
           uiBackground={{
-            ...this.image.uiBackground, uvs: getImageAtlasMapping({
+            ...this.imageElement.uiBackground, uvs: getImageAtlasMapping({
               ...sourcesComponentsCoordinates.switches[this._getImageStyle()],
               atlasHeight: sourcesComponentsCoordinates.atlasHeight,
               atlasWidth: sourcesComponentsCoordinates.atlasWidth,
             }),
           }}
         />
-        <Label {...this.label} />
+        <Label
+          {...this.labelElement}
+          value={String(this.text)}
+          color={this.labelElement.color || this.darkTheme ? Color4.White() : Color4.Black()}
+        />
       </UiEntity>
     )
   }
 
   private _getImageStyle(): PromptSwitchStyles | 'roundOff' | 'squareOff' {
     if (this._checked) {
-      return this._style
+      return this.style
     } else {
-      if (this._style == PromptSwitchStyles.ROUNDGREEN || this._style == PromptSwitchStyles.ROUNDRED) {
+      if (this.style == PromptSwitchStyles.ROUNDGREEN || this.style == PromptSwitchStyles.ROUNDRED) {
         return 'roundOff'
       } else {
         return 'squareOff'
@@ -184,10 +194,10 @@ export class PromptSwitch extends InPromptUIObject {
   private _click = (): void => {
     if (!this._checked) {
       this.check()
-      this._onCheck()
+      this.onCheck()
     } else {
       this.uncheck()
-      this._onUncheck()
+      this.onUncheck()
     }
   }
 }

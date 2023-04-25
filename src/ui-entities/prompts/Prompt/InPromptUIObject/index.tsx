@@ -4,18 +4,27 @@ import { UIObject, UIObjectConfig } from '../../../UIObject'
 
 export type InPromptUIObjectConfig = UIObjectConfig & {
   promptVisible: boolean;
+  promptWidth: number;
+  promptHeight: number;
+  darkTheme: boolean;
 }
 
 export abstract class InPromptUIObject extends UIObject {
-  protected _promptVisible: boolean
+  public promptVisible: boolean
+  public promptWidth: number
+  public promptHeight: number
+  public darkTheme: boolean
 
-  protected constructor({ promptVisible, ...config }: InPromptUIObjectConfig) {
+  protected constructor({ promptVisible, promptWidth, promptHeight, darkTheme, ...config }: InPromptUIObjectConfig) {
     super(config)
 
-    this._promptVisible = promptVisible
+    this.promptVisible = promptVisible
+    this.promptWidth = promptWidth
+    this.promptHeight = promptHeight
+    this.darkTheme = darkTheme
   }
 
   public changedPromptVisible(visible: boolean): void {
-    this._promptVisible = visible
+    this.promptVisible = visible
   }
 }

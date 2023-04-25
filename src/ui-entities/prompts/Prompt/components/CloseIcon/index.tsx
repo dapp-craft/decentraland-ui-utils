@@ -1,9 +1,10 @@
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 import { Callback } from '@dcl/react-ecs/dist/components/listeners/types'
+import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
 
 import { InPromptUIObject, InPromptUIObjectConfig } from '../../InPromptUIObject'
 
-import { getImageAtlasMapping, ImageAtlasData } from '../../../../../utils/imageUtils'
+import { getImageAtlasMapping } from '../../../../../utils/imageUtils'
 
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../../constants/resources'
 
@@ -23,7 +24,6 @@ export type PromptCloseIconConfig = InPromptUIObjectConfig & {
 
 const promptCloseIconInitialConfig: Required<PromptCloseIconConfig> = {
   startHidden: false,
-  promptVisible: false,
   style: PromptCloseIconStyles.CLOSED,
   width: 32,
   height: 32,
@@ -31,6 +31,10 @@ const promptCloseIconInitialConfig: Required<PromptCloseIconConfig> = {
   yPosition: 10,
   onMouseDown: () => {
   },
+  promptVisible: false,
+  promptWidth: 400,
+  promptHeight: 250,
+  darkTheme: false,
 } as const
 
 /**
@@ -45,12 +49,14 @@ const promptCloseIconInitialConfig: Required<PromptCloseIconConfig> = {
  *
  */
 export class PromptCloseIcon extends InPromptUIObject {
-  private readonly _section: ImageAtlasData
-  private readonly _width: number
-  private readonly _height: number
-  private readonly _xPosition: number
-  private readonly _yPosition: number
-  private readonly _onMouseDown: Callback
+  public iconElement: EntityPropTypes
+
+  public style: PromptCloseIconStyles
+  public width: number
+  public height: number
+  public xPosition: number
+  public yPosition: number
+  public onMouseDown: Callback
 
   constructor(
     {
@@ -62,41 +68,54 @@ export class PromptCloseIcon extends InPromptUIObject {
       yPosition = promptCloseIconInitialConfig.yPosition,
       onMouseDown = promptCloseIconInitialConfig.onMouseDown,
       promptVisible = promptCloseIconInitialConfig.promptVisible,
+      promptWidth,
+      promptHeight,
+      darkTheme,
     }: PromptCloseIconConfig) {
-    super({ startHidden: startHidden || !promptVisible, promptVisible })
+    super({ startHidden: startHidden || !promptVisible, promptVisible, promptWidth, promptHeight, darkTheme })
 
-    this._section = {
-      ...sourcesComponentsCoordinates.icons[style],
-      atlasHeight: sourcesComponentsCoordinates.atlasHeight,
-      atlasWidth: sourcesComponentsCoordinates.atlasWidth,
+    this.onMouseDown = onMouseDown
+
+    this.width = width
+    this.height = height
+    this.xPosition = xPosition
+    this.yPosition = yPosition
+    this.style = style
+
+    this.iconElement = {
+      uiBackground: {
+        textureMode: 'stretch',
+        texture: {
+          src: AtlasTheme.ATLAS_PATH_LIGHT,
+        },
+      },
+      uiTransform: {
+        positionType: 'absolute',
+      },
     }
-
-    this._width = width
-    this._height = height
-    this._xPosition = xPosition
-    this._yPosition = yPosition
-    this._onMouseDown = onMouseDown
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
     return (
       <UiEntity
         key={key}
-        uiTransform={{
-          display: (this.visible && this._promptVisible) ? 'flex' : 'none',
-          width: this._width,
-          height: this._height,
-          positionType: 'absolute',
-          position: { top: this._yPosition, right: this._xPosition },
-        }}
+        {...this.iconElement}
         uiBackground={{
-          textureMode: 'stretch',
-          texture: {
-            src: AtlasTheme.ATLAS_PATH_LIGHT,
-          },
-          uvs: getImageAtlasMapping(this._section),
+          ...this.iconElement.uiBackground,
+          uvs: getImageAtlasMapping({
+            ...sourcesComponentsCoordinates.icons[this.style],
+            atlasHeight: sourcesComponentsCoordinates.atlasHeight,
+            atlasWidth: sourcesComponentsCoordinates.atlasWidth,
+          }),
         }}
-        onMouseDown={this._onMouseDown}
+        uiTransform={{
+          ...this.iconElement.uiTransform,
+          display: (this.visible && this.promptVisible) ? 'flex' : 'none',
+          width: this.width,
+          height: this.height,
+          position: { top: this.yPosition, right: this.xPosition },
+        }}
+        onMouseDown={this.onMouseDown}
       />
     )
   }

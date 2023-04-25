@@ -12,20 +12,19 @@ export type PromptInputConfig = InPromptUIObjectConfig & {
   xPosition: number;
   yPosition: number;
   onChange?: (value: string) => void;
-  promptWidth: number;
-  promptHeight: number;
 }
 
 const promptInputInitialConfig: Required<PromptInputConfig> = {
   startHidden: false,
-  promptVisible: false,
   placeholder: 'Fill in',
   xPosition: 0,
   yPosition: 0,
   onChange: () => {
   },
+  promptVisible: false,
   promptWidth: 400,
   promptHeight: 250,
+  darkTheme: false,
 } as const
 
 /**
@@ -38,14 +37,17 @@ const promptInputInitialConfig: Required<PromptInputConfig> = {
  *
  */
 export class PromptInput extends InPromptUIObject {
-  public fillInBox: EntityPropTypes & Partial<UiInputProps>
-  public currentText: string = ''
+  public fillInBoxElement: EntityPropTypes & Partial<UiInputProps>
 
-  private readonly _xPosition: number
-  private readonly _yPosition: number
+  public placeholder: string | number
+  public xPosition: number
+  public yPosition: number
+  public onChange: (value: string) => void
+
+  private _xPosition: number | undefined
+  private _yPosition: number | undefined
   private readonly _width: number
   private readonly _height: number
-  private readonly _onChange: (value: string) => void
 
   constructor(
     {
@@ -57,24 +59,27 @@ export class PromptInput extends InPromptUIObject {
       promptWidth = promptInputInitialConfig.promptWidth,
       promptHeight = promptInputInitialConfig.promptHeight,
       promptVisible = promptInputInitialConfig.promptVisible,
+      darkTheme,
     }: PromptInputConfig) {
-    super({ startHidden: startHidden || !promptVisible, promptVisible })
+    super({ startHidden: startHidden || !promptVisible, promptVisible, promptWidth, promptHeight, darkTheme })
 
     this._width = 312
     this._height = 46
 
-    this._onChange = onChange
-    this._xPosition = promptWidth / -2 + this._width / 2 + xPosition
-    this._yPosition = promptHeight / 2 + this._height / -2 + yPosition
+    this.placeholder = placeholder
+    this.xPosition = xPosition
+    this.yPosition = yPosition
 
-    this.fillInBox = {
+    this.onChange = onChange
+
+    this.fillInBoxElement = {
       uiTransform: {
         width: this._width,
         height: this._height,
         positionType: 'absolute',
-        position: { bottom: this._yPosition, right: this._xPosition * -1 },
+
       },
-      placeholder: String(placeholder),
+      placeholder: String(this.placeholder),
       fontSize: 22,
       textAlign: 'middle-center',
       font: defaultFont,
@@ -83,15 +88,19 @@ export class PromptInput extends InPromptUIObject {
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
+    this._xPosition = this.promptWidth / -2 + this._width / 2 + this.xPosition
+    this._yPosition = this.promptHeight / 2 + this._height / -2 + this.yPosition
+
     return (
       <Input
         key={key}
-        {...this.fillInBox}
+        {...this.fillInBoxElement}
         uiTransform={{
-          ...this.fillInBox.uiTransform,
-          display: (this.visible && this._promptVisible) ? 'flex' : 'none',
+          ...this.fillInBoxElement.uiTransform,
+          display: (this.visible && this.promptVisible) ? 'flex' : 'none',
+          position: { bottom: this._yPosition, right: this._xPosition * -1 },
         }}
-        onChange={this._onChange}
+        onChange={this.onChange}
       />
     )
   }

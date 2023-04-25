@@ -33,9 +33,10 @@ executeTask(async function () {
     Vector3.create(3, 1, 3),
     (bool: boolean) => {
       if (bool) {
-        announcement.show()
-      } else {
+        
         announcement.hide()
+      } else {
+        announcement.show()
       }
     }
   )

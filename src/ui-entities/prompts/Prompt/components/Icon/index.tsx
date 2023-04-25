@@ -12,20 +12,19 @@ export type PromptIconConfig = InPromptUIObjectConfig & {
   xPosition?: number;
   yPosition?: number;
   section?: ImageAtlasData;
-  promptWidth: number;
-  promptHeight: number;
 }
 
 const promptIconInitialConfig: Omit<Required<PromptIconConfig>, 'section'> = {
   startHidden: false,
-  promptVisible: false,
   image: '',
   width: 128,
   height: 128,
   xPosition: 0,
   yPosition: 0,
+  promptVisible: false,
   promptWidth: 400,
   promptHeight: 250,
+  darkTheme: false,
 } as const
 
 /**
@@ -40,12 +39,17 @@ const promptIconInitialConfig: Omit<Required<PromptIconConfig>, 'section'> = {
  *
  */
 export class PromptIcon extends InPromptUIObject {
-  public image: EntityPropTypes
+  public imageElement: EntityPropTypes
 
-  private readonly _width: number
-  private readonly _height: number
-  private readonly _xPosition: number
-  private readonly _yPosition: number
+  public image: string
+  public width: number
+  public height: number
+  public xPosition: number
+  public yPosition: number
+  public section: ImageAtlasData | undefined
+
+  private _xPosition: number | undefined
+  private _yPosition: number | undefined
 
   constructor(
     {
@@ -55,44 +59,53 @@ export class PromptIcon extends InPromptUIObject {
       height = promptIconInitialConfig.height,
       xPosition = promptIconInitialConfig.xPosition,
       yPosition = promptIconInitialConfig.yPosition,
-      promptVisible = promptIconInitialConfig.promptVisible,
       section,
+      promptVisible = promptIconInitialConfig.promptVisible,
       promptWidth,
       promptHeight,
+      darkTheme,
     }: PromptIconConfig) {
-    super({ startHidden: startHidden || !promptVisible, promptVisible })
+    super({ startHidden: startHidden || !promptVisible, promptVisible, promptWidth, promptHeight, darkTheme })
 
-    this._width = width
-    this._height = height
+    this.width = width
+    this.height = height
+    this.xPosition = xPosition
+    this.yPosition = yPosition
+    this.image = image
+    if (section) this.section = section
 
-    this._xPosition = promptWidth / -2 + this._width / 2 + xPosition
-    this._yPosition = promptHeight / 2 + this._height / -2 + yPosition
-
-    this.image = {
+    this.imageElement = {
       uiTransform: {
-        width: this._width,
-        height: this._height,
         positionType: 'absolute',
-        position: { bottom: this._yPosition, right: this._xPosition * -1 },
       },
       uiBackground: {
         textureMode: 'stretch',
-        texture: {
-          src: image,
-        },
-        uvs: getImageAtlasMapping(section),
       },
     }
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
+    this._xPosition = this.promptWidth / -2 + this.width / 2 + this.xPosition
+    this._yPosition = this.promptHeight / 2 + this.height / -2 + this.yPosition
+
     return (
       <UiEntity
         key={key}
-        {...this.image}
+        {...this.imageElement}
+        uiBackground={{
+          ...this.imageElement.uiBackground,
+          texture: {
+            ...this.imageElement.uiBackground?.texture,
+            src: this.image,
+          },
+          uvs: getImageAtlasMapping(this.section),
+        }}
         uiTransform={{
-          ...this.image.uiTransform,
-          display: (this.visible && this._promptVisible) ? 'flex' : 'none',
+          ...this.imageElement.uiTransform,
+          display: (this.visible && this.promptVisible) ? 'flex' : 'none',
+          position: { bottom: this._yPosition, right: this._xPosition * -1 },
+          width: this.width,
+          height: this.height,
         }}
       />
     )

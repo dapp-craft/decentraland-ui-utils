@@ -1,4 +1,4 @@
-import { ReactEcsRenderer } from '@dcl/sdk/react-ecs'
+import ReactEcs, { ReactEcsRenderer } from '@dcl/sdk/react-ecs'
 
 import { announcement } from './ui-entities/Announcement'
 import { uiCounter } from './ui-entities/UiCounter'
@@ -11,6 +11,7 @@ import { okPrompt } from './ui-entities/OkPrompt'
 import { optionPrompt } from './ui-entities/OptionPrompt'
 import { fillInPrompt } from './ui-entities/FillInPrompt'
 import { customPrompt } from './ui-entities/CustomPrompt'
+
 
 const uiComponent = () => {
   return [

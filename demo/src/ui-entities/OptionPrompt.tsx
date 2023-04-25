@@ -10,7 +10,8 @@ export const optionPrompt = new ui.OptionPrompt({
   onReject: () => {
     optionPrompt.hide()
     console.log('optionPrompt onReject')
-  }
+  },
+  onClose: () => console.log('close optionPrompt____________'),
 })
 
 // optionPrompt.show()

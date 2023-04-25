@@ -1,5 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Label } from '@dcl/sdk/react-ecs'
+import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
+import { UiLabelProps } from '@dcl/react-ecs/dist/components/Label/types'
 
 import { UIObject, UIObjectConfig } from '../UIObject'
 
@@ -39,12 +41,15 @@ const counterInitialConfig: Required<CounterConfig> = {
  *
  */
 export class Counter extends UIObject {
+  public textElement: EntityPropTypes & UiLabelProps
+
+  public xOffset: number
+  public yOffset: number
+  public color: Color4
+  public size: number
+  public fixedDigits: number
+
   private _value: number
-  private readonly _xOffset: number
-  private readonly _yOffset: number
-  private readonly _color: Color4
-  private readonly _size: number
-  private readonly _fixedDigits: number
   private readonly _valueStep: number
 
   constructor(
@@ -59,14 +64,29 @@ export class Counter extends UIObject {
     }: CounterConfig) {
     super({ startHidden })
 
+    this.xOffset = xOffset
+    this.yOffset = yOffset
+    this.color = color
+    this.size = size
+    this.fixedDigits = fixedDigits
+
     this._value = value
-    this._xOffset = xOffset
-    this._yOffset = yOffset
-    this._color = color
-    this._size = size
-    this._fixedDigits = fixedDigits
 
     this._valueStep = 1
+
+    this.textElement = {
+      value: toFixedLengthStringUtil(
+        {
+          value: this._value,
+          fixedDigits: this.fixedDigits,
+        },
+      ),
+      textAlign: 'bottom-right',
+      font: defaultFont,
+      uiTransform: {
+        positionType: 'absolute',
+      },
+    }
   }
 
   /**
@@ -107,22 +127,21 @@ export class Counter extends UIObject {
     return (
       <Label
         key={key}
+        {...this.textElement}
+        fontSize={this.size}
+        color={this.color}
         value={
           toFixedLengthStringUtil(
             {
               value: this._value,
-              fixedDigits: this._fixedDigits,
+              fixedDigits: this.fixedDigits,
             },
           )
         }
-        color={this._color}
-        fontSize={this._size}
-        textAlign='bottom-right'
-        font={defaultFont}
         uiTransform={{
+          ...this.textElement.uiTransform,
           display: this.visible ? 'flex' : 'none',
-          positionType: 'absolute',
-          position: { bottom: this._yOffset, right: this._xOffset * -1 },
+          position: { bottom: this.yOffset, right: this.xOffset * -1 },
         }}
       />
     )

@@ -1,8 +1,9 @@
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
 
 import { DelayedHidingUIObject, DelayedHidingUIObjectConfig } from '../UIObject'
 
-import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
+import { getImageAtlasMapping } from '../../utils/imageUtils'
 
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../constants/resources'
 
@@ -38,12 +39,14 @@ const loadingInitialConfig: Required<LoadingConfig & LoadingSizeConfig> = {
  *
  */
 export class Loading extends DelayedHidingUIObject {
-  private readonly _xOffset: number
-  private readonly _yOffset: number
-  private readonly _width: number
-  private readonly _height: number
+  public imageElement: EntityPropTypes
 
-  private readonly _section: ImageAtlasData
+  public xOffset: number
+  public yOffset: number
+  public scale: number
+
+  private _width: number | undefined
+  private _height: number | undefined
 
   constructor(
     {
@@ -55,36 +58,43 @@ export class Loading extends DelayedHidingUIObject {
     }: LoadingConfig | undefined = {}) {
     super({ startHidden, duration })
 
-    this._width = loadingInitialConfig.width * scale
-    this._height = loadingInitialConfig.height * scale
-    this._xOffset = xOffset
-    this._yOffset = yOffset
+    this.xOffset = xOffset
+    this.yOffset = yOffset
+    this.scale = scale
 
-    this._section = {
-      ...sourcesComponentsCoordinates.icons['TimerLarge'],
-      atlasHeight: sourcesComponentsCoordinates.atlasHeight,
-      atlasWidth: sourcesComponentsCoordinates.atlasWidth,
+    this.imageElement = {
+      uiTransform: {
+        positionType: 'absolute',
+        position: { top: '50%', left: '50%' },
+      },
+      uiBackground: {
+        textureMode: 'stretch',
+        texture: {
+          src: AtlasTheme.ATLAS_PATH_LIGHT,
+        },
+        uvs: getImageAtlasMapping({
+          ...sourcesComponentsCoordinates.icons['TimerLarge'],
+          atlasHeight: sourcesComponentsCoordinates.atlasHeight,
+          atlasWidth: sourcesComponentsCoordinates.atlasWidth,
+        }),
+      },
     }
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
+    this._width = loadingInitialConfig.width * this.scale
+    this._height = loadingInitialConfig.height * this.scale
+
     return (
       <UiEntity
         key={key}
+        {...this.imageElement}
         uiTransform={{
-          display: this.visible ? 'flex' : 'none',
+          ...this.imageElement.uiTransform,
           width: this._width,
           height: this._height,
-          positionType: 'absolute',
-          position: { top: '50%', left: '50%' },
-          margin: { top: this._yOffset * -1 - this._height / 2, left: this._xOffset - this._width / 2 },
-        }}
-        uiBackground={{
-          textureMode: 'stretch',
-          texture: {
-            src: AtlasTheme.ATLAS_PATH_LIGHT,
-          },
-          uvs: getImageAtlasMapping(this._section),
+          display: this.visible ? 'flex' : 'none',
+          margin: { top: this.yOffset * -1 - this._height / 2, left: this.xOffset - this._width / 2 },
         }}
       />
     )

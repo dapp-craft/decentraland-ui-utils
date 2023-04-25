@@ -1,4 +1,5 @@
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
 
 import { UIObject, UIObjectConfig } from '../UIObject'
 
@@ -50,12 +51,15 @@ const iconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
  *
  */
 export class Icon extends UIObject {
-  private readonly _image: string
-  private readonly _width: number
-  private readonly _height: number
-  private readonly _xOffset: number
-  private readonly _yOffset: number
-  private readonly _section?: ImageAtlasData
+  public imageElement: EntityPropTypes
+
+  public image: string
+  public size: IconSizeType
+  public width: number
+  public height: number
+  public xOffset: number
+  public yOffset: number
+  public section: ImageAtlasData | undefined
 
   constructor(
     {
@@ -71,31 +75,42 @@ export class Icon extends UIObject {
     }: IconConfig & IconInitialConfig) {
     super({ startHidden })
 
-    this._image = image
-    this._width = width
-    this._height = height
-    this._xOffset = xOffset
-    this._yOffset = yOffset
-    if (section) this._section = section
+    this.image = image
+    this.size = size
+    this.width = width
+    this.height = height
+    this.xOffset = xOffset
+    this.yOffset = yOffset
+    if (section) this.section = section
+
+    this.imageElement = {
+      uiBackground: {
+        textureMode: 'stretch',
+      },
+      uiTransform: {
+        positionType: 'absolute',
+      },
+    }
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
     return (
       <UiEntity
         key={key}
-        uiTransform={{
-          display: this.visible ? 'flex' : 'none',
-          width: this._width,
-          height: this._height,
-          positionType: 'absolute',
-          position: { bottom: this._yOffset, right: this._xOffset * -1 },
-        }}
+        {...this.imageElement}
         uiBackground={{
-          textureMode: 'stretch',
+          ...this.imageElement.uiBackground,
           texture: {
-            src: this._image,
+            src: this.image,
           },
-          uvs: getImageAtlasMapping(this._section),
+          uvs: getImageAtlasMapping(this.section),
+        }}
+        uiTransform={{
+          ...this.imageElement.uiTransform,
+          width: this.width,
+          height: this.height,
+          display: this.visible ? 'flex' : 'none',
+          position: { bottom: this.yOffset, right: this.xOffset * -1 },
         }}
       />
     )

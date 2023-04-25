@@ -5,6 +5,7 @@ export const fillInPrompt = new ui.FillInPrompt({
   onAccept: (value: string) => {
     console.log('fillInPrompt onAccept', value)
   },
+  onClose: () => console.log('close fillInPrompt____________'),
 })
 
 // fillInPrompt.show()

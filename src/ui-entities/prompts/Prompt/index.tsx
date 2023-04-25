@@ -24,11 +24,14 @@ export enum PromptStyles {
   DARKSLANTED = `darkslanted`
 }
 
-type PromptConfig = UIObjectConfig & {
-  style?: PromptStyles;
+export type PromptExternalConfig = UIObjectConfig & {
   width?: number;
   height?: number;
   onClose?: Callback;
+}
+
+export type PromptConfig = PromptExternalConfig & {
+  style?: PromptStyles;
 }
 
 const promptInitialConfig: Required<PromptConfig> = {
@@ -36,7 +39,8 @@ const promptInitialConfig: Required<PromptConfig> = {
   style: PromptStyles.LIGHT,
   width: 400,
   height: 250,
-  onClose: () => {},
+  onClose: () => {
+  },
 } as const
 
 /**
@@ -49,15 +53,18 @@ const promptInitialConfig: Required<PromptConfig> = {
  *
  */
 export class Prompt extends UIObject {
+  public closeIcon: PromptCloseIcon
+
+  public style: PromptStyles
+  public width: number | undefined
+  public height: number | undefined
+  public onClose: Callback
+
   private _texture: AtlasTheme
   private _section: ImageAtlasData
-  private readonly _width: number
-  private readonly _height: number
-  private readonly _style: PromptStyles
-  private readonly _onClose: Callback
   private _components: (PromptCloseIcon | PromptText | PromptIcon | PromptButton | PromptCheckbox | PromptSwitch | PromptInput)[]
   private readonly _closeIconData: PromptCloseIconConfig
-  private readonly _isDarkTheme: boolean
+  public readonly isDarkTheme: boolean
 
   constructor(
     {
@@ -69,8 +76,10 @@ export class Prompt extends UIObject {
     }: PromptConfig | undefined = {}) {
     super({ startHidden })
 
-    this._style = style
-    this._onClose = onClose
+    this.style = style
+    this.width = width
+    this.height = height
+    this.onClose = onClose
 
     this._texture = AtlasTheme.ATLAS_PATH_LIGHT
 
@@ -85,17 +94,19 @@ export class Prompt extends UIObject {
       width: 32,
       height: 32,
       style: PromptCloseIconStyles.CLOSED,
+      darkTheme: false,
       onMouseDown: this._close,
+      promptWidth: this._getWidth(),
+      promptHeight: this._getHeight(),
     }
 
     this._setStyle()
 
-    this._width = width ? width : this._section.sourceWidth
-    this._height = height ? height : this._section.sourceHeight
+    this.isDarkTheme = this._texture !== AtlasTheme.ATLAS_PATH_LIGHT
 
-    this._components = [new PromptCloseIcon(this._closeIconData)]
+    this.closeIcon = new PromptCloseIcon(this._closeIconData)
 
-    this._isDarkTheme = this._texture !== AtlasTheme.ATLAS_PATH_LIGHT
+    this._components = [this.closeIcon]
   }
 
   public show() {
@@ -116,12 +127,10 @@ export class Prompt extends UIObject {
     })
   }
 
-  public addTextBox(config: Omit<PromptInputConfig, 'promptHeight' | 'promptWidth' | 'promptVisible'>): PromptInput {
+  public addTextBox(config: Omit<PromptInputConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptInput {
     const uiInput = new PromptInput({
       ...config,
-      promptVisible: this.visible,
-      promptWidth: this._width,
-      promptHeight: this._height,
+      ...this._getPromptComponentCustomConfig(),
     })
 
     this._components.push(uiInput)
@@ -129,14 +138,11 @@ export class Prompt extends UIObject {
     return uiInput
   }
 
-  public addSwitch(config: Omit<PromptSwitchConfig, 'promptHeight' | 'promptWidth' | 'promptVisible'>): PromptSwitch {
+  public addSwitch(config: Omit<PromptSwitchConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptSwitch {
     const uiSwitch = new PromptSwitch(
       {
         ...config,
-        promptVisible: this.visible,
-        promptWidth: this._width,
-        promptHeight: this._height,
-        darkTheme: this._isDarkTheme,
+        ...this._getPromptComponentCustomConfig(),
       },
     )
 
@@ -145,14 +151,11 @@ export class Prompt extends UIObject {
     return uiSwitch
   }
 
-  public addCheckbox(config: Omit<PromptCheckboxConfig, 'promptHeight' | 'promptWidth' | 'promptVisible'>): PromptCheckbox {
+  public addCheckbox(config: Omit<PromptCheckboxConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptCheckbox {
     const uiCheckbox = new PromptCheckbox(
       {
         ...config,
-        promptVisible: this.visible,
-        promptWidth: this._width,
-        promptHeight: this._height,
-        darkTheme: this._isDarkTheme,
+        ...this._getPromptComponentCustomConfig(),
       },
     )
 
@@ -161,13 +164,11 @@ export class Prompt extends UIObject {
     return uiCheckbox
   }
 
-  public addButton(config: Omit<PromptButtonConfig, 'promptHeight' | 'promptWidth' | 'promptVisible'>): PromptButton {
+  public addButton(config: Omit<PromptButtonConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptButton {
     const uiButton = new PromptButton(
       {
         ...config,
-        promptVisible: this.visible,
-        promptWidth: this._width,
-        promptHeight: this._height,
+        ...this._getPromptComponentCustomConfig(),
       },
     )
 
@@ -176,12 +177,11 @@ export class Prompt extends UIObject {
     return uiButton
   }
 
-  public addText(config: Omit<PromptTextConfig, 'darkTheme' | 'promptVisible'>): PromptText {
+  public addText(config: Omit<PromptTextConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptText {
     const uiText = new PromptText(
       {
         ...config,
-        promptVisible: this.visible,
-        darkTheme: this._isDarkTheme,
+        ...this._getPromptComponentCustomConfig(),
       },
     )
 
@@ -190,12 +190,10 @@ export class Prompt extends UIObject {
     return uiText
   }
 
-  public addIcon(config: Omit<PromptIconConfig, 'promptHeight' | 'promptWidth' | 'promptVisible'>): PromptIcon {
+  public addIcon(config: Omit<PromptIconConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptIcon {
     const uiIcon = new PromptIcon({
       ...config,
-      promptVisible: this.visible,
-      promptWidth: this._width,
-      promptHeight: this._height,
+      ...this._getPromptComponentCustomConfig(),
     })
 
     this._components.push(uiIcon)
@@ -204,6 +202,15 @@ export class Prompt extends UIObject {
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
+    const width = this._getWidth()
+    const height = this._getHeight()
+
+    this._components.forEach((component) => {
+      component.promptWidth = this._getWidth()
+      component.promptHeight = this._getHeight()
+      component.darkTheme = this.isDarkTheme
+    })
+
     return (
       <UiEntity
         key={key}
@@ -214,9 +221,9 @@ export class Prompt extends UIObject {
           justifyContent: 'center',
           positionType: 'absolute',
           position: { top: '50%', left: '50%' },
-          margin: { top: -this._height / 2, left: -this._width / 2 },
-          width: this._width,
-          height: this._height,
+          margin: { top: -height / 2, left: -width / 2 },
+          width,
+          height,
         }}
       >
         <UiEntity
@@ -243,8 +250,25 @@ export class Prompt extends UIObject {
     )
   }
 
+  private _getPromptComponentCustomConfig() {
+    return {
+      promptVisible: this.visible,
+      darkTheme: this.isDarkTheme,
+      promptWidth: this._getWidth(),
+      promptHeight: this._getHeight(),
+    }
+  }
+
+  private _getWidth(): number {
+    return this.width ? this.width : this._section.sourceWidth
+  }
+
+  private _getHeight(): number {
+    return this.height ? this.height : this._section.sourceHeight
+  }
+
   private _setStyle() {
-    switch (this._style) {
+    switch (this.style) {
       case PromptStyles.LIGHT:
         this._section = {
           ...sourcesComponentsCoordinates.backgrounds.promptBackground,
@@ -254,7 +278,7 @@ export class Prompt extends UIObject {
 
         this._texture = AtlasTheme.ATLAS_PATH_LIGHT
 
-        this._closeIconData.style = PromptCloseIconStyles.CLOSED
+        // this._closeIconData.style = PromptCloseIconStyles.CLOSED
 
         break
       case PromptStyles.DARK:
@@ -324,7 +348,7 @@ export class Prompt extends UIObject {
   }
 
   private _close = (): void => {
-    this._onClose()
+    this.onClose()
 
     this.hide()
   }

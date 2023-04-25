@@ -6,6 +6,7 @@ export const okPrompt = new ui.OkPrompt({
     okPrompt.hide()
     console.log('okPrompt onAccept')
   },
+  onClose: () => console.log('close okPrompt____________'),
 })
 
 // okPrompt.show()

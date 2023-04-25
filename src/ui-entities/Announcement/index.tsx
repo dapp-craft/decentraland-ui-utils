@@ -1,5 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Label } from '@dcl/sdk/react-ecs'
+import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
+import { UiLabelProps } from '@dcl/react-ecs/dist/components/Label/types'
 
 import { DelayedHidingUIObject, DelayedHidingUIObjectConfig } from '../UIObject'
 
@@ -37,11 +39,14 @@ const announcementInitialConfig: Required<AnnouncementConfig> = {
  *
  */
 export class Announcement extends DelayedHidingUIObject {
+  public textElement: EntityPropTypes & UiLabelProps
+
+  public xOffset: number
+  public yOffset: number
+  public color: Color4
+  public size: number
+
   private readonly _value: string | number
-  private readonly _xOffset: number
-  private readonly _yOffset: number
-  private readonly _color: Color4
-  private readonly _size: number
 
   constructor(
     {
@@ -55,27 +60,39 @@ export class Announcement extends DelayedHidingUIObject {
     }: AnnouncementConfig) {
     super({ startHidden, duration })
 
+    this.xOffset = xOffset
+    this.yOffset = yOffset
+    this.color = color
+    this.size = size
+
     this._value = value
-    this._xOffset = xOffset
-    this._yOffset = yOffset
-    this._color = color
-    this._size = size
+
+    this.textElement = {
+      value: String(this._value),
+      textAlign: 'bottom-center',
+      font: defaultFont,
+      uiTransform: {
+        positionType: 'absolute',
+        position: { bottom: '50%', left: '50%' },
+      },
+    }
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
     return (
       <Label
         key={key}
+        {...this.textElement}
+        fontSize={this.size}
+        color={this.textElement.color || this.color}
         value={String(this._value)}
-        color={this._color}
-        fontSize={this._size}
-        textAlign='bottom-center'
-        font={defaultFont}
         uiTransform={{
+          ...this.textElement.uiTransform,
           display: this.visible ? 'flex' : 'none',
-          positionType: 'absolute',
-          position: { bottom: '50%', left: '50%' },
-          margin: { left: this._xOffset, bottom: this._yOffset },
+          margin: {
+            left: this.xOffset,
+            bottom: this.yOffset,
+          },
         }}
       />
     )

@@ -1,4 +1,5 @@
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import { EntityPropTypes } from '@dcl/react-ecs/dist/components/types'
 
 import { DelayedHidingUIObject, DelayedHidingUIObjectConfig } from '../UIObject'
 
@@ -38,12 +39,14 @@ const centerImageInitialConfig: Omit<Required<CenterImageConfig>, 'section'> = {
  *
  */
 export class CenterImage extends DelayedHidingUIObject {
-  private readonly _image: string
-  private readonly _xOffset: number
-  private readonly _yOffset: number
-  private readonly _width: number
-  private readonly _height: number
-  private readonly _section?: ImageAtlasData
+  public imageElement: EntityPropTypes
+
+  public image: string
+  public width: number
+  public height: number
+  public xOffset: number
+  public yOffset: number
+  public section: ImageAtlasData | undefined
 
   constructor(
     {
@@ -58,32 +61,42 @@ export class CenterImage extends DelayedHidingUIObject {
     }: CenterImageConfig) {
     super({ startHidden, duration })
 
-    this._image = image
-    this._width = width
-    this._height = height
-    this._xOffset = xOffset
-    this._yOffset = yOffset
-    if (section) this._section = section
+    this.image = image
+    this.width = width
+    this.height = height
+    this.xOffset = xOffset
+    this.yOffset = yOffset
+    if (section) this.section = section
+
+    this.imageElement = {
+      uiTransform: {
+        positionType: 'absolute',
+        position: { top: '50%', left: '50%' },
+      },
+      uiBackground: {
+        textureMode: 'stretch',
+      },
+    }
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
     return (
       <UiEntity
         key={key}
+        {...this.imageElement}
         uiTransform={{
+          ...this.imageElement.uiTransform,
           display: this.visible ? 'flex' : 'none',
-          width: this._width,
-          height: this._height,
-          positionType: 'absolute',
-          position: { top: '50%', left: '50%' },
-          margin: { top: this._yOffset * -1 - this._height / 2, left: this._xOffset - this._width / 2 },
+          width: this.width,
+          height: this.height,
+          margin: { top: this.yOffset * -1 - this.height / 2, left: this.xOffset - this.width / 2 },
         }}
         uiBackground={{
-          textureMode: 'stretch',
+          ...this.imageElement.uiBackground,
           texture: {
-            src: this._image,
+            src: this.image,
           },
-          uvs: getImageAtlasMapping(this._section),
+          uvs: getImageAtlasMapping(this.section),
         }}
       />
     )
