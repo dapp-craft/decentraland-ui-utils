@@ -1,13 +1,40 @@
-# UI-library
+# Decentraland UI utils library
 
 A collection of tools for common UI requirements for Decentraland scenes.
 
-To use any of the helpers provided by the UI utils library:
+- [Using the UI utils library](#using-the-ui-utils-library)
+- [Text Announcement](#text-announcement)
+- [Counter](#counter)
+- [Corner Labels](#corner-labels)
+- [Bar](#bar)
+- [Corner Icons](#corner-icons)
+- [Loading icon](#loading-icon)
+- [Large image](#large-image)
+- [Predefined prompt windows](#predefined-prompt-windows)
+  - [Ok Prompt](#ok-prompt)
+  - [Option Prompt](#option-prompt)
+  - [Fill in Prompt](#fill-in-prompt)
+- [Custom Prompt Windows](#custom-prompt-windows)
+  - [Create a custom prompt](#create-a-custom-prompt)
+  - [Customizing close button](#customizing-close-button)
+  - [Add text](#add-text)
+  - [Add a button](#add-a-button)
+  - [Add a Checkbox](#add-a-checkbox)
+  - [Add a Switch](#add-a-switch)
+  - [Add an icon](#add-an-icon)
+  - [Add an input box](#add-an-input-box)
+  - [Full Custom UI example](#full-custom-ui-example)
+- [Contribute](#contribute)
+- [CI/CD](#cicd)
 
-1. Install the library as an npm package. Run this command in your scene's project folder:
+## Using the UI utils library
+
+To use any of the helpers provided by the utils library
+
+1. Install it as an `npm` package. Run this command in your scene's project folder:
 
 ```
-npm i @dcl/ui-scene-utils -B
+npm install @dcl/ui-scene-utils -B
 ```
 
 2. Run `dcl start` or `dcl build` so the dependencies are correctly installed.
@@ -18,218 +45,445 @@ npm i @dcl/ui-scene-utils -B
 import * as ui from '@dcl/ui-scene-utils'
 ```
 
-4. In your TypeScript file, write `ui`. and let the suggestions of your IDE show the available helpers.
+4. In your TypeScript file, write `ui.` and let the suggestions of your IDE show the available helpers.
 
 ## Text Announcement
 
-To display a text announcement on the center of the screen for a specified amount of time, use the `displayAnnouncement` function.
+To display a text announcement on the center of the screen for a specified amount of time, use the `Announcement` class.
 
 ```ts
-ui.displayAnnouncement('Hello world')
+const announcement = new ui.Announcement({ value: 'Text center', duration: 3 })
+
+// ...
+
+announcement.render('my-announcement')
 ```
 
 <img src="screenshots/announcement.png" width="400">
 
-This function can take the following parameters:
+When instancing, you can pass the following parameters:
 
-- `value`: String to display
-- `duration`: Time to keep the text visible (in seconds). Default: 3 seconds. If set to -1, the announcement will remain on screen till it's hidden.
-- `color`: Text color, as a _Color4_, default: yellow.
-- `size`: Font size, default: 50
-- `bordersOff`: The text has a thin black margin unless this field is set to _true_.
+- `value: string`: String to display.
+- `duration: number = 3`: Time to keep the text visible (in seconds). If set to -1, the announcement will remain on screen till it's hidden.
+- `color: Color4 = Color4.Yellow()`\*: Text color, as a `Color4`.
+- `size: number = 50`\*: Font size.
+- `xOffset: number = 0`\*: Offset from the center on the X axis.
+- `yOffset: number = 0`\*: Offset from the center on the Y axis.
+- `startHidden: boolean = true`: If true, the announcement starts invisible till you run its `show()` function.
 
-```ts
-ui.displayAnnouncement('Ouch!', 5, Color4.Red(), 50, true)
-```
-
-To hide any open announcements, you can call `hideAnnouncements()`.
+> Note: options marked with `*` can later be changed by accessing the relevant properties of the created announcement.
 
 ```ts
-ui.hideAnnouncements()
+const announcement = new ui.Announcement({
+  value: 'Text center',
+  startHidden: false,
+  duration: 5,
+  color: Color4.Red(),
+  size: 50,
+  xOffset: 100,
+  yOffset: -50,
+})
 ```
+
+After creating, `Announcement` has methods to control visibility:
+
+- `hide(): void`: Hides the announcement.
+- `show(): void`: Shows the announcement (that will be automatically hidden after the specified `duration`).
+
+```ts
+pointerEventsSystem.onPointerDown(
+  myEntity,
+  () => {
+    announcement.show()
+  },
+  {
+    button: InputAction.IA_PRIMARY,
+    hoverText: 'Show announcement',
+  }
+)
+```
+
+Announcement components that you can interact with:
+
+- `textElement: EntityPropTypes & UiLabelProps`: Props for the underlying `Label` text component.
 
 ## Counter
 
-To display a number on a corner of the screen that can be easily updated, you can create a `Counter`.
+To display a number on a corner of the screen that can be easily updated, you can create a `UICounter`.
 
 ```ts
-let ammo = new ui.UICounter(30)
+const ammo = new ui.UICounter({ value: 123 })
+
+// ...
+
+ammo.render('player-ammo')
 ```
 
 <img src="screenshots/counter.png" width="150">
 
 When instancing a new counter you can pass the following parameters:
 
-- `value`: Starting value
-- `xOffset`: Offset on X away from the bottom-left corner
-- `yOffset`: Offset on Y away from the bottom-left corner
-- `color`: Text color, white by default
-- `size`: Text size, 25 by default
-- `bordersOff`: The text has a thin black margin unless this field is set to _true_.
+- `value: number`: Numeric starting value.
+- `xOffset: number = -40`\*: Offset on X away from the bottom-right corner.
+- `yOffset: number = 70`\*: Offset on Y away from the bottom-right corner.
+- `color: Color4 = Color4.White()`\*: Text color.
+- `size: number = 25`\*: Text size.
+- `fixedDigits: number = 0`\*: Number of digits to use, `0` allows any digits number.
+- `startHidden: boolean = true`: If true, the counter starts invisible till you run its `show()` function.
+
+> Note: options marked with `*` can later be changed by accessing the relevant properties of the created counter.
 
 ```ts
-let ammo = new ui.UICounter(30, 0, 60, Color4.Yellow(), 30, true)
+const ammo = new ui.UICounter({
+  value: 123,
+  startHidden: false,
+  xOffset: -50,
+  yOffset: 100,
+  color: Color4.Black(),
+  size: 35,
+  fixedDigits: 2,
+})
+
+//
+
+ammo.xOffset = -100
 ```
 
 Once a `UICounter` object is instanced, you can call the following functions on it:
 
-- `read`: Returns the current value of the counter
-- `increase`: Increases the number by a given amount. If no parameters are passed, it raises the value by 1.
-- `decrease`: Decreases the number by a given amount. If no parameters are passed, it lowers the value by 1.
-- `set`: Sets the number to a given amount, no matter what the previous value was.
+- `read(): number`: Returns the current value of the counter.
+- `increase(amount?: number): void`: Increases the number by a given amount. If no parameters are passed, it raises the value by 1.
+- `decrease(amount?: number): void`: Decreases the number by a given amount. If no parameters are passed, it lowers the value by 1.
+- `set(amount: number): void`: Sets the number to a given amount, no matter what the previous value was.
+- `show(): void`: Shows the counter.
+- `hide(): void`: Hides the counter.
 
 ```ts
-myEntiy.addComponent(new OnPointerDown(e => {
-  if (ammo.read() <= 0) return
-  ammo.decrease()
-})
+pointerEventsSystem.onPointerDown(
+  myEntity,
+  () => {
+    if (ammo.read() <= 0) {
+      return
+    }
+
+    ammo.decrease()
+  },
+  {
+    button: InputAction.IA_PRIMARY,
+    hoverText: 'Click',
+  }
+)
 ```
+
+Counter components that you can interact with:
+
+- `textElement: EntityPropTypes & UiLabelProps`: Props for the underlying `Label` text component.
 
 ## Corner Labels
 
 To display text on the bottom-left corner of the screen, you can create a `CornerLabel`.
 
 ```ts
-let healthLabel = new ui.CornerLabel('Health:')
+const healthLabel = new ui.CornerLabel({ value: 'Health: ' })
+
+/// ...
+
+healthLabel.render('health-label')
 ```
+
+<img src="screenshots/corner-label.png" width="350">
 
 When instancing a new corner label you can pass the following parameters:
 
-- `value`: Text to show.
-- `xOffset`: Offset on X, relative to the bottom-right corner.
-- `yOffset`: Offset on Y, relative to the bottom-right corner.
-- `color`: Text color, white by default
-- `size`: Text size, 25 by default
-- `bordersOff`: The text has a thin black margin unless this field is set to _true_.
+- `value: string | number` - Text to show.
+- `xOffset: number = -70`\*: Offset on X, relative to the bottom-right corner.
+- `yOffset: number = 40`\*: Offset on Y, relative to the bottom-right corner.
+- `color: Color4 = Color4.White()`\*: Text color.
+- `size: number = 25`\*: Text size.
+- `startHidden: boolean = true`: If true, the label starts invisible till you run its `show()` function.
+
+> Note: options marked with `*` can later be changed by accessing the relevant properties of the created label.
+
+```ts
+const healthLabel = new ui.CornerLabel({
+  value: 'Health: ',
+  xOffset: -300,
+  yOffset: 70,
+  color: Color4.Black(),
+  size: 30,
+  startHidden: false,
+})
+
+//
+
+healthLabel.color = Color4.White()
+```
+
+After the `CornerLabel` is being instanced, you can call this methods:
+
+- `hide(): void`: Hides the label.
+- `show(): void`: Shows the label.
+
+```ts
+pointerEventsSystem.onPointerDown(
+  myEntity,
+  () => {
+    healthLabel.hide()
+  },
+  {
+    button: InputAction.IA_PRIMARY,
+    hoverText: 'Exit game',
+  }
+)
+```
+
+Label components that you can interact with:
+
+- `textElement: EntityPropTypes & UiLabelProps`: Props for the underlying `Label` text component.
 
 ## Bar
 
 To display a bar that can be updated to increase or shorten in length, similar to a typical health bar in games, you can create a `UIBar`.
 
 ```ts
-let health = new ui.UIBar(0.8)
+const health = new ui.UIBar({ value: 0.5 })
+
+/// ...
+
+health.render('player-health')
 ```
 
-<img src="screenshots/bar.png" width="150">
+<img src="screenshots/bar.png" width="200">
 
 When instancing a new bar you can pass the following parameters:
 
-- `value`: Starting value of the bar, from 0 to 1. With 1 the bar is full, with 0 it's empty.
-- `xOffset`: Offset on X away from the bottom-left corner.
-- `yOffset`: Offset on Y away from the bottom-left corner.
-- `fillColor`: Color of the bar filling, red by default.
-- `style`: Margin style of the bar, from a list of different predetermined options in different colors and shapes. It takes a value from the `BarStyles` enum.
-- `scale`: Multiplier to alter the size of the bar proportionally. A scale of 1 = 128 x 32 pixels.
+- `value: number`: Starting value of the bar, from 0 to 1. With 1 the bar is full, with 0 it's empty.
+- `xOffset: number = -30`\*: Offset on X away from the bottom-right corner.
+- `yOffset: number = 60`\*: Offset on Y away from the bottom-right corner.
+- `color: Color4: Color4.Red()`\*: Color of the bar filling.
+- `style: BarStyles = BarStyles.ROUNDSILVER`\*: Margin style of the bar, from a list of different predetermined options in different colors and shapes. It takes a value from the `BarStyles` enum.
+- `scale: number = 1`\*: Multiplier to alter the size of the bar proportionally. A scale of 1 = 128 x 32 pixels.
+- `startHidden: boolean = true`: If true, the bar starts invisible till you run its `show()` function.
+
+> Note: options marked with `*` can later be changed by accessing the relevant properties of the created progress bar.
 
 ```ts
-let health = new ui.UIBar(1, -30, 130, Color4.Red(), ui.BarStyles.ROUNDSILVER, 1)
+const health = new ui.UIBar({
+  value: 1,
+  xOffset: -30,
+  yOffset: 130,
+  color: Color4.Red(),
+  style: ui.BarStyles.ROUNDSILVER,
+  scale: 1,
+})
+
+//
+
+health.scale = 1.25
 ```
 
 Once a `UIBar` object is instanced, you can call the following functions on it:
 
-- `read`: Returns the current value of the counter.
-- `increase`: Increases the number by a given amount. If no parameters are passed, it raises the value by 0.1.
-- `decrease`: Secreases the number by a given amount. If no parameters are passed, it lowers the value by 0.1.
-- `set`: Sets the bar to a given value, no matter what the previous value was.
+- `read(): number`: Returns the current value of the counter.
+- `increase(amount?: number): void`: Increases the number by a given amount. If no parameters are passed, it raises the value by 0.1.
+- `decrease(amount?: number): void`: Decreases the number by a given amount. If no parameters are passed, it lowers the value by 0.1.
+- `set(value: amount): void`: Sets the bar to a given value, no matter what the previous value was.
+- `hide(): void`: Hides the bar.
+- `show(): void`: Shows the bar.
 
 ```ts
-myEntiy.addComponent(new OnPointerDown(e => {
-	health.decrease(0.1)
-	if (health.read() <= 0) {
-		// die
-	}
-})
+pointerEventsSystem.onPointerDown(
+  myEntity,
+  () => {
+    health.decrease(0.1)
+    if (health.read() <= 0) {
+      // die
+    }
+  },
+  {
+    button: InputAction.IA_PRIMARY,
+    hoverText: 'Hit',
+  }
+)
 ```
+
+Progress bar components that you can interact with:
+
+- `barElement: EntityPropTypes`: Props for the underlying `UiEntity` wrapper component.
+- `backgroundElement: EntityPropTypes`: Props for `UiEntity` component that is responsible for the background.
+- `processElement: EntityPropTypes`: Props for `UiEntity` component that is responsible for displaying the progress.
 
 ## Corner Icons
 
 To display an icon of on the bottom-left corner of the screen you can create one of the following:
 
+- `Icon`: generic component that accepts `size` parameter.
 - `SmallIcon`: by default 32x32 pixels in size.
 - `MediumIcon`: by default 64x64 pixels in size.
 - `LargeIcon`: by default 128x128 pixels in size.
 
 ```ts
-let healthIcon = new ui.MediumIcon('images/heart64.png')
+const mediumIcon = new ui.MediumIcon({ image: 'images/scene-thumbnail.png' })
+mediumIcon.show()
+
+/// ...
+
+mediumIcon.render('scene-thumbnail-icon')
 ```
 
-<img src="screenshots/icon.png" width="200">
+<img src="screenshots/icons.png" width="200">
 
 When instancing a new icon you can pass the following parameters:
 
-- `image`: Path to the image file.
-- `xOffset`: Offset on X, relative to the bottom-right corner.
-- `yOffset`: Offset on Y, relative to the bottom-right corner.
-- `width`: Image width on screen in pixels.
-- `height`: Image height on screen in pixels.
-- `section`: Use only a section of the image file, useful when arranging multiple icons into an image atlas. This field takes an `ImageSection` object, specifying `sourceWidth` and `sourceHeight`, and optionally also `sourceLeft` and `sourceTop`.
+- `image: string`\*: Path to the image file.
+- `xOffset: number = -30`\*: Offset on X, relative to the bottom-right corner.
+- `yOffset: number = -50`\*: Offset on Y, relative to the bottom-right corner.
+- `width?: number`\*: Image width on screen in pixels. Default value depends on icon's type (`32` for `SmallIcon`, `64` for `MediumIcon` and `128` for `LargeIcon`).
+- `height?: number`\*: Image height on screen in pixels. Default value depends on icon's type (`32` for `SmallIcon`, `64` for `MediumIcon` and `128` for `LargeIcon`).
+- `size: 'small' | 'medium' | 'large'`: Icon sizes. **Available only for `Icon`**.
+- `section?: ImageAtlasData`\*: Use only a section of the image file, useful when arranging multiple icons into an image atlas. This field takes an `ImageAtlasData` object, specifying `sourceWidth`, `sourceHeight`, `sourceLeft`, `sourceTop`, `atlasWidth` and `atlasHeight`.
+- `startHidden: boolean = true`: If true, the icon starts invisible till you run its `show()` function.
+
+> Note: options marked with `*` can later be changed by accessing the relevant properties of the created icon.
 
 ```ts
-let ammoIcon = new ui.SmallIcon('images/ammo32.png', -70, 70)
-let healthIcon = new ui.MediumIcon('images/heart64.png', -170, 120)
+const ammoIcon = new ui.SmallIcon({
+  image: 'images/ammo32.png',
+  xOffset: -70,
+  yOffset: 70,
+  startHidden: false,
+})
+
+const healthIcon = new ui.MediumIcon({
+  image: 'images/heart64.png',
+  xOffset: -170,
+  yOffset: 120,
+})
+
+//
+
+ammoIcon.yOffset = 50
 ```
+
+After the icon is being instanced, you can call this methods to manipulate it's visibility:
+
+- `hide(): void`: Hides the icon.
+- `show(): void`: Shows the icon.
+
+Icon components that you can interact with:
+
+- `imageElement: EntityPropTypes`: Props for the underlying `UiEntity` image component.
 
 ## Loading icon
 
 To display a loading icon on the center of the screen for a specified amount of time, create a `LoadingIcon`.
 
 ```ts
-loading = new ui.LoadingIcon(3)
+const loading = new ui.LoadingIcon({ duration: 3 })
+
+// ...
+
+loading.render('loading-icon')
 ```
 
 <img src="screenshots/timer.png" width="100">
 
 When instancing a new loading icon, you can pass the following parameters:
 
-- `duration`: seconds to display the image onscreen. If not set, or set to 0, it keeps the icon on till you hide it.
-- `xOffset`: Offset on X, relative to the center of the screen.
-- `yOffset`: Offset on Y, relative to the center of the screen.
-- `scale`: Multiplier to alter the size of the icon proportionally. A scale of 1 = 48 x 64 pixels.
+- `duration: number = 0`: seconds to display the image onscreen. If not set, or set to 0, it keeps the icon on till you hide it.
+- `xOffset: number = 0`\*: Offset on X, relative to the center of the screen.
+- `yOffset: number = 0`\*: Offset on Y, relative to the center of the screen.
+- `scale: number = 1`\*: Multiplier to alter the size of the icon proportionally. A scale of 1 = 50 x 66 pixels.
+- `startHidden: boolean = true`: If true, the icon starts invisible till you run its `show()` function.
+
+> Note: options marked with `*` can later be changed by accessing the relevant properties of the created loading icon.
 
 ```ts
-loading = new ui.LoadingIcon(3, 0, 40, 0.5)
+const loading = new ui.LoadingIcon({
+  duration: 3,
+  xOffset: 0,
+  yOffset: 40,
+  scale: 0.5,
+  startHidden: false,
+})
+
+//
+
+loading.scale = 0.75
 ```
 
-Once a `LoadingIcon` object is instanced, you can call the `hide()` function to remove it.
+Once a `LoadingIcon` object is instanced, you can call this methods:
 
-## Full screen image
+- `hide(): void`: Hides the icon.
+- `show(): void`: Shows the icon.
 
-To display a large image on the center of the screen for a spefified amount of time, create a `CenterImage`. By default images must be 512 x 512 pixels, unless specified.
+Loading icon components that you can interact with:
+
+- `imageElement: EntityPropTypes`: Props for the underlying `UiEntity` image component.
+
+## Large image
+
+To display a large image on the center of the screen for a specified amount of time, create a `CenterImage`. By default images must be 512 x 512 pixels, unless specified.
 
 ```ts
-let largeImage = new ui.CenterImage('images/Burn.png')
+const largeImage = new ui.CenterImage({ image: 'images/Burn.png' })
+
+// ...
+
+largeImage.render('burn-image')
+
+// ...
+
+largeImage.show()
 ```
 
 When instancing a new large image, you can pass the following parameters:
 
-- `image`: Path to image file.
-- `duration`: Seconds to display the image onscreen, 3 seconds by default. -1 keeps it on till you hide it.
-- `startHidden`: If true, the image starts invisible till you run its `show()` function. Large images may flash white for a second if created and shown at the same time. By deferring the creation you avoid this artifact.
-- `xOffset`: Offset on X, relative to the center of the screen.
-- `yOffset`: Offset on Y, relative to the center of the screen.
+- `image: string`\*: Path to image file.
+- `duration: number`: Seconds to display the image onscreen. -1 keeps it on till you hide it.
+- `xOffset: number = 0`\*: Offset on X, relative to the center of the screen.
+- `yOffset: number = 0`\*: Offset on Y, relative to the center of the screen.
+- `width: number = 512`\*: Image width on screen in pixels.
+- `height: number = 512`\*: Image height on screen in pixels.
+- `section?: ImageAtlasData`\*: Use only a section of the image file, useful when arranging multiple images into an image atlas. This field takes an `ImageAtlasData` object, specifying `sourceWidth`, `sourceHeight`, `sourceLeft`, `sourceTop`, `atlasWidth` and `atlasHeight`.
+- `startHidden: boolean = true`: If true, the image starts invisible till you run its `show()` function. Large images may flash white for a second if created and shown at the same time. By deferring the creation you avoid this artifact.
 
-* `width`: Image width on screen in pixels, 512 by default.
-* `height`: Image height on screen in pixels, 512 by default.
-* `section`: Use only a section of the image file, useful when arranging multiple images into an image atlas. This field takes an `ImageSection` object, specifying `sourceWidth` and `sourceHeight`, and optionally also `sourceLeft` and `sourceTop`.
+> Note: options marked with `*` can later be changed by accessing the relevant properties of the created image.
 
 ```ts
-let gameOver = new ui.CenterImage('images/Burn.png', 3, true, 0, 0, 512, 512, {
-  sourceHeight: 512,
-  sourceWidth: 512,
-  sourceLeft: 0,
-  sourceTop: 0
+const gameOver = new ui.CenterImage({
+  image: 'images/Burn.png',
+  duration: 3,
+  startHidden: true,
+  xOffset: 0,
+  yOffset: 0,
+  width: 512,
+  height: 512,
+  section: {
+    sourceHeight: 512,
+    sourceWidth: 512,
+    sourceLeft: 0,
+    sourceTop: 0,
+    atlasWidth: 1,
+    atlasHeight: 1,
+  },
 })
+
 gameOver.show()
 ```
 
 Once a `CenterImage` object is instanced, you can call the following functions on it:
 
-- `show`: Shows the image.
-- `hide`: Hides the image.
+- `show(): void`: Shows the image.
+- `hide(): void`: Hides the image.
+
+Large image components that you can interact with:
+
+- `imageElement: EntityPropTypes`: Props for the underlying `UiEntity` image component.
 
 ## Predefined prompt windows
 
-The UI Utils library includes various common prompt windows to display messages and ask players to take action.
+The UI Utils library includes various common prompt windows to display messages and ask players to take an action.
 
 ### Ok Prompt
 
@@ -237,25 +491,49 @@ Displays a prompt window with a custom message and an OK button. The Ok button c
 
 When instancing a new Ok Prompt, you can pass the following parameters:
 
-- `instructions`: Message string.
-- `onAccept`: Function that gets executed if player clicks the button or presses E.
-- `acceptLabel`: Label to go in the accept button, "Ok" by default.
-- `useDarkTheme`: Switch the style of the window to the dark theme.
+- `text: string`: Message string.
+- `onAccept?: () => void`: Function that gets executed if player clicks the button or presses E.
+- `acceptLabel: string = 'Ok'`: Label to go in the accept button.
+- `useDarkTheme: boolean = false`: Switch the style of the window to the dark theme.
+- `width: number = 400`: Width of the prompt.
+- `height: number = 250`: Height of the prompt.
+- `onClose?: () => void`: If provided, a callback function that fires when the prompt is closed via the (X) button.
+- `startHidden: boolean = true`: If true, the prompt starts invisible till you run its `show()` function.
 
 ```ts
-let prompt = new ui.OkPrompt(
-  'This is an Ok Prompt',
-  () => {
-    log(`accepted`)
+const prompt = new ui.OkPrompt({
+  text: 'This is an Ok Prompt',
+  onAccept: () => {
+    log('accepted')
   },
-  'Ok',
-  true
-)
+  acceptLabel: 'Ok',
+  useDarkTheme: true,
+  width: 450,
+  height: 300,
+  startHidden: false,
+})
+
+// ...
+
+prompt.render('example-ok-prompt')
 ```
 
-<img src="screenshots/okPrompt.png" width="400">
+<img src="screenshots/ok-prompt.png" width="400">
 
-> Note: If the player closes the window with the close icon, the related function isn't called.
+> Note: If the player closes the window with the close icon, the related `onAccept` function isn't called.
+
+Once a `OkPrompt` object is instanced, you can call the following functions on it:
+
+- `show(): void`: Shows the prompt.
+- `hide(): void`: Hides the prompt.
+
+> Note: prompt will not be closed automatically after the user clicks the button or presses the E key. You should close it manually using the `hide` method.
+
+Prompt parts that you can interact with:
+
+- `textElement: PromptText`: Main text element of the prompt. [Learn more.](#add-text)
+- `buttonElement: PromptButton`: Accept button of the prompt. [Learn more.](#add-a-button)
+- `closeIcon: PromptCloseIcon`: Close icon of the prompt. [Learn more.](#customizing-close-button)
 
 ### Option Prompt
 
@@ -263,32 +541,60 @@ Displays a prompt window with a custom message, a title, and two buttons that pe
 
 When instancing a new Option Prompt, you can pass the following parameters:
 
-- `title`: Header in bold letters at the top of the window
-- `instructions`: Smaller print instructions.
-- `onAccept`: Function that gets executed if player clicks accept.
-- `onReject`: Function that gets executed if player clicks reject.
-- `acceptLabel`: String to go in the accept button
-- `rejectLabel`: String to go in the reject button
-- `useDarkTheme`: Switch the style of the window to the dark theme.
+- `title: string | number`: Header at the top of the window.
+- `titleSize: number = 24`: Size of the header text.
+- `text: string | number`: Smaller print instructions displayed at the center of the prompt.
+- `textSize: number = 21`: Size of the prompt text.
+- `onAccept?: () => void`: Function that gets executed if player clicks accept (left) button or presses the E key.
+- `onReject?: () => void`: Function that gets executed if player clicks reject (right) button or presses the F key.
+- `acceptLabel: string = 'Yes'`: String to go in the accept button
+- `rejectLabel: string = 'No'`: String to go in the reject button
+- `useDarkTheme: boolean = false`: Switch the style of the window to the dark theme.
+- `width: number = 400`: Width of the prompt.
+- `height: number = 250`: Height of the prompt.
+- `onClose?: () => void`: If provided, a callback function that fires when the prompt is closed via the (X) button.
+- `startHidden: boolean = true`: If true, the prompt starts invisible till you run its `show()` function.
 
 ```ts
-let prompt = new ui.OptionPrompt(
-  'Pick an option!',
-  'What will you choose?',
-  () => {
-    log(`picked option A`)
+const prompt = new ui.OptionPrompt({
+  title: 'Pick an option!',
+  text: 'What will you choose?',
+  acceptLabel: 'Pick A',
+  rejectLabel: 'Pick B',
+  onAccept: () => {
+    optionPrompt.hide()
+    console.log('picked option A')
   },
-  () => {
-    log(`picked option B`)
+  onReject: () => {
+    optionPrompt.hide()
+    console.log('picked option B')
   },
-  'Pick A',
-  'Pick B'
-)
+  startHidden: false,
+})
+
+// ...
+
+prompt.render('option-prompt')
 ```
 
-<img src="screenshots/optionPrompt.png" width="400">
+<img src="screenshots/option-prompt.png" width="400">
 
 > Note: If the player closes the window with the close icon, neither of the functions are called.
+
+Once a `OptionPrompt` object is instanced, you can call the following functions on it:
+
+- `show(): void`: Shows the prompt.
+- `hide(): void`: Hides the prompt.
+
+> Note: prompt will not be closed automatically after the user clicks buttons or presses the E or F key. You should close it manually using the `hide` method.
+
+Prompt parts that you can interact with:
+
+- `titleElement: PromptText`: Title element of the prompt. [Learn more.](#add-text)
+- `textElement: PromptText`: Main text element of the prompt. [Learn more.](#add-text)
+- `primaryButtonElement: PromptButton`: Primary button of the prompt. [Learn more.](#add-a-button)
+- `secondaryButtonElement: PromptButton`: Secondary button of the prompt. [Learn more.](#add-a-button)
+- `closeIcon: PromptCloseIcon`: Close icon of the prompt. [Learn more.](#customizing-close-button)
 
 ### Fill in Prompt
 
@@ -296,26 +602,43 @@ Displays a prompt window with a header, a text field to fill in and a submit but
 
 When instancing a new Fill-in Prompt, you can pass the following parameters:
 
-- `title`: Header in bold letters at the top of the window.
-- `onAccept`: Function that gets executed when player clicks button of presses the E key.
-- `acceptLabel`: String to use as label on the submit button. "Submit" by default.
-- `placeholder`: Text to display as placeholder in the text box.
-- `useDarkTheme`: Switch the style of the window to the dark theme.
+- `title: string | number`: Header at the top of the window.
+- `titleSize: number = 24`: Size of the header text.
+- `onAccept: (value: string) => void`: Function that gets executed when player clicks the button or presses the E key.
+- `acceptLabel: string = 'Submit'`: String to use as label on the submit button.
+- `placeholder: string = 'Fill in'`: Text to display as placeholder in the text box.
+- `useDarkTheme: boolean = false`: Switch the style of the window to the dark theme.
+- `width: number = 400`: Width of the prompt.
+- `height: number = 250`: Height of the prompt.
+- `onClose?: () => void`: If provided, a callback function that fires when the prompt is closed via the (X) button.
+- `startHidden: boolean = true`: If true, the prompt starts invisible till you run its `show()` function.
 
 ```ts
-let prompt = new ui.FillInPrompt(
-  'What are you thinking?',
-  (e: string) => {
-    log(e)
+const prompt = new ui.FillInPrompt({
+  title: 'What are you thinking?',
+  onAccept: (value: string) => {
+    console.log('accepted value:', value)
   },
-  'Submit!',
-  'Text goes here'
-)
+})
 ```
 
-<img src="screenshots/fillInPrompt.png" width="400">
+<img src="screenshots/fill-in-prompt.png" width="400">
 
 > Note: If the player closes the window with the close icon, the related function isn't called.
+
+Once a `FillInPrompt` object is instanced, you can call the following functions on it:
+
+- `show(): void`: Shows the prompt.
+- `hide(): void`: Hides the prompt.
+
+> Note: prompt will not be closed automatically after the user clicks the button or presses the E key. You should close it manually using the `hide` method.
+
+Prompt parts that you can interact with:
+
+- `titleElement: PromptText`: Title element of the prompt. [Learn more.](#add-text)
+- `inputElement: PromptInput`: Input field element of the prompt. [Learn more.](#add-an-input-box)
+- `buttonElement: PromptButton`: Submit button of the prompt. [Learn more.](#add-a-button)
+- `closeIcon: PromptCloseIcon`: Close icon of the prompt. [Learn more.](#customizing-close-button)
 
 ## Custom Prompt Windows
 
@@ -326,18 +649,22 @@ Custom prompt windows let you arrange as many elements as you want into a window
 First create a new `CustomPrompt` object.
 
 ```ts
-let prompt = new ui.CustomPrompt(ui.PromptStyles.DARKSLANTED)
+const prompt = new ui.CustomPrompt({ style: ui.PromptStyles.DARKSLANTED })
+
+// ...
+
+prompt.render('my-custom-prompt')
 ```
 
-<img src="screenshots/customPrompt1.png" width="400">
+<img src="screenshots/custom-prompt-background.png" width="400">
 
 When instancing a new CustomPrompt, you can pass the following parameters:
 
-- `style`: Pick from a few predefined options, some of them using the dark theme, others the light theme. You can also provide a string with a path to a custom image to use as a background instead.
-- `width`: Background width on screen in pixels. The default size depends on the theme used.
-- `height`: Background height on screen in pixels. The default size depends on the theme used.
-- `startHidden`: If true, image starts invisible to load in the background till calling the `show()` function of the prompt object.
-- `onClose`: If provided, a callback function that fires when the prompt is closed via the (X) button.
+- `style: PromptStyles = PromptStyles.LIGHT`: Pick from a few predefined options, some of them using the dark theme, others the light theme.
+- `width: number = 400`: Background width on screen in pixels. The default size depends on the theme used.
+- `height: number = 250`: Background height on screen in pixels. The default size depends on the theme used.
+- `startHidden: boolean = true`: If true, the prompt starts invisible to load in the background till calling the `show()` function of the prompt object.
+- `onClose?: () => void`: If provided, a callback function that fires when the prompt is closed via the (X) button.
 
 > Note: Stretching the background images away from their default values may lead to blurry corners.
 
@@ -350,219 +677,365 @@ You can also call the following functions on it:
 
 Access all of the UI elements that make up the prompt UI by calling the `elements` property of the prompt object.
 
-### Add Text
+### Customizing close button
+
+When you're creating a prompt, it'll have a close button at the upper right corner. Anytime you can access `closeIcon` property of `PromptCloseIcon` type to change some of it's options:
+
+- `width: number = 32`: Button width.
+- `height: number = 32`: Button height.
+- `xPosition: number = 10`: Offset on X from the top of the window.
+- `yPosition: number = 10`: Offset on X from the right of the window.
+- `onMouseDown: () => void`: Callback that is called when the user clicks on the button.
+
+> Note: When changing the `onMouseDown`, be sure to call the `hide` method of the related popup's to close it.
+
+Close button components that you can interact with:
+
+- `iconElement: EntityPropTypes`: Props for the underlying `UiEntity` image component.
+
+### Add text
 
 To add text to a custom prompt, use the `addText` function.
 
 ```ts
-let myText = prompt.addText('Hello World', 0, 100)
+const promptHeader = prompt.addText({
+  value: 'Hello World!',
+  xPosition: 0,
+  yPosition: 100,
+  size: 30,
+})
 ```
+
+<img src="screenshots/custom-prompt-text.png" width="400">
 
 The `addText()` function can take the following parameters:
 
-- `value`: Text to show.
-- `posX`: Offset on X from the center of the window.
-- `posY`: Offset on Y from the center of the window.
-- `color`: Text color.
-- `size`: Text size.
+- `value: string | number`: Text to show.
+- `xPosition: number`: Offset on X from the center of the window.
+- `yPosition: number`: Offset on Y from the center of the window.
+- `color: Color4 = Color4.Black()`: Text color.
+- `size: number = 14`: Text size.
+- `startHidden: boolean = false`: If true, text will be invisible till calling the `show()` function.
 
-The `addText()` function returns a `CustomPromptText` object, that you can then reference to change its values. This object also has the following functions that can be called any time:
+> Note: you can later change all of this options (except `startHidden`) by accessing the relevant properties of the created `PromptText`.
 
-- `hide`
-- `show`
+The `addText()` function returns a `PromptText` object, that you can then reference to change its values. This object has the following functions that can be called any time:
+
+- `hide(): void`: Hides the text.
+- `show(): void`: Shows the text.
+
+Text components that you can interact with:
+
+- `textElement: EntityPropTypes & UiLabelProps`: Props for the underlying `Label` component.
 
 ### Add a button
 
 To add a button to a custom prompt, use the `addButton` function.
 
 ```ts
-let myButton = prompt.addButton(
-  'Yes',
-  0,
-  -30,
-  () => {
-    log('Yes')
-    prompt.hide()
+const promptButtonE = customPrompt.addButton({
+  style: ui.ButtonStyles.E,
+  text: 'Yeah',
+  xPosition: 0,
+  yPosition: 0,
+  onMouseDown: () => {
+    console.log('Yeah pressed')
   },
-  ui.ButtonStyles.E
-)
+})
+
+const promptButtonF = customPrompt.addButton({
+  style: ui.ButtonStyles.F,
+  text: 'Nope',
+  xPosition: 0,
+  yPosition: -75,
+  onMouseDown: () => {
+    console.log('Nope pressed')
+  },
+})
 ```
+
+<img src="screenshots/custom-prompt-buttons.png" width="400">
 
 The `addButton` function can take the following parameters:
 
-- `label`: Label to show on the button.
-- `posX`: Offset on X from the center of the window.
-- `posY`: Offset on Y from the center of the window.
-- `onClick`: Function to execute when the button is clicked.
-- `style`: Choose out of several predefined style options, with different colors and rounded or square corners.
+- `text: string | number`\*: Label to show on the button.
+- `xPosition: number`\*: Offset on X from the center of the window.
+- `yPosition: number`\*: Offset on Y from the center of the window.
+- `onMouseDown: () => void`\*: Function to execute when the button is clicked.
+- `style: PromptButtonStyles = PromptButtonStyles.ROUNDSILVER`: Choose out of several predefined style options, with different colors and rounded or square corners.
+- `startHidden: boolean = false`: If true, the button will be invisible till calling the `show()` function.
+
+> Note: options marked with `*` can later be changed by accessing the relevant properties of the returned `PromptButton`.
 
 > Note: If you pick the `E` or `F` style, the buttons will also be triggered when pressing the E or F keys respectively.
 
 <img src="screenshots/button-styles.png" width="250">
 
-The `addButton()` function returns a `CustomPromptButton` object, that you can then reference to change its values. This object also has the following functions that can be called any time:
+The `addButton()` function returns a `PromptButton` object, that you can then reference to change its values. This object has the following functions that can be called any time:
 
-- `hide`
-- `show`
-- `grayOut`: Sets the text to gray and makes it unclickable.
-- `enable`: Sets the text to white and makes it clickable again.
+- `hide(): void`
+- `show(): void`
+- `grayOut(): void`: Sets the text to gray and makes it unclickable.
+- `enable(): void`: Sets the text to white and makes it clickable again.
+
+Button components that you can interact with:
+
+- `labelElement: EntityPropTypes`: Props for the `Label` component that is responsible for the button label.
+- `imageElement: EntityPropTypes`: Props for the `UiEntity` component that is responsible for the button background image.
+- `iconElement: EntityPropTypes`: Props for the `UiEntity` component that is responsible for the button icon.
 
 ### Add a Checkbox
 
 To add a checkbox to a custom prompt, use the `addCheckbox` function.
 
 ```ts
-let myCheckbox = prompt.addCheckbox(
-  "Don't show again",
-  -80,
-  50,
-  () => {
-    log('checkbox ticked')
+const promptCheckbox = customPrompt.addCheckbox({
+  text: "Don't show again",
+  xPosition: -80,
+  yPosition: 0,
+  onCheck: () => {
+    console.log('checkbox checked')
   },
-  () => {
-    log('checkbox unticked')
-  }
-)
+  onUncheck: () => {
+    console.log('checkbox unchecked')
+  },
+})
 ```
+
+<img src="screenshots/custom-prompt-checkbox.png" width="400">
 
 The `addCheckbox` function can take the following parameters:
 
-- `label`: Label to show next to the checkbox.
-- `posX`: Offset on X from the center of the window.
-- `posY`: Offset on Y from the center of the window.
-- `onCheck`: Function to execute when the box is checked.
-- `onUncheck`: Function to execute when the box is unchecked.
-- `large`: The default size of the checkbox is 24 x 24 pixels, checking this box sets the size to 32 x 32.
-- `startChecked`: If true, the box starts checked by default.
+- `text: string`: Label to show next to the checkbox.
+- `xPosition: number`: Offset on X from the center of the window.
+- `yPosition: number`: Offset on Y from the center of the window.
+- `onCheck?: () => void`: Function to execute when the box is checked.
+- `onUncheck?: () => void`: Function to execute when the box is unchecked.
+- `large: boolean = false`: If `true`, the box size to 32 x 32.
+- `startChecked: boolean = false`: If true, the box starts checked by default.
+- `startHidden: boolean = false`: If true, the checkbox will be invisible till calling the `show()` function.
 
-The `addCheckbox()` function returns a `CustomPromptCheckbox` object, that you can then reference to change and read its values. This object also has the following functions that can be called any time:
+> Note: you can later change all of this options (except `startChecked` and `startHidden`) by accessing the relevant properties of the created `PromptCheckbox`.
 
-- `hide`
-- `show`
-- `check`: Sets the element to checked, without performing the associated function.
-- `uncheck`: Sets the element to checked, without performing the associated function.
+The `addCheckbox()` function returns a `PromptCheckbox` object, that you can then reference to change and read its values. This object has the following functions that can be called any time:
 
-You can also read the returned object's `checked` property at any time to find its current state.
+- `hide(): void`
+- `show(): void`
+- `check(): void`: Sets the element to checked, **without** performing the associated function.
+- `uncheck(): void`: Sets the element to checked, **without** performing the associated function.
+
+Checkbox components and components that you can interact with:
+
+- `imageElement: EntityPropTypes`: Props for the `UiEntity` component that is responsible for the checkbox's box image.
+- `labelElement: EntityPropTypes & UiLabelProps`: Props for the `Label` component that is responsible for the checkbox label.
 
 ### Add a Switch
 
 To add a switch to a custom prompt, use the `addSwitch` function.
 
 ```ts
-let mySwitch = prompt.addSwitch(
-  'Turn on',
-  -80,
-  50,
-  () => {
-    log('switch activated')
+const promptSwitch = customPrompt.addSwitch({
+  text: 'Turn me',
+  xPosition: -60,
+  yPosition: 0,
+  onCheck: () => {
+    console.log('switch checked')
   },
-  () => {
-    log('switch deactivated')
+  onUncheck: () => {
+    console.log('switch unchecked')
   },
-  ui.SwitchStyles.SQUAREGREEN
-)
+})
 ```
+
+<img src="screenshots/custom-prompt-switch.png" width="400">
 
 The `addSwitch` function can take the following parameters:
 
-- `label`: Label to show next to the switch.
-- `posX`: Offset on X from the center of the window.
-- `posY`: Offset on Y from the center of the window.
-- `onCheck`: Function to execute when the switch is activated.
-- `onUncheck`: Function to execute when the switch is deactivated.
-- `style`: Pick between several sizes, with different colors and rounded or square corners. The value must be from the `SwitchStyles` enum.
-- `startChecked`: If true, the switch starts activated by default.
+- `text: string`: Label to show next to the switch.
+- `xPosition: number`: Offset on X from the center of the window.
+- `yPosition: number`: Offset on Y from the center of the window.
+- `onCheck?: () => void`: Function to execute when the switch is activated.
+- `onUncheck?: () => void`: Function to execute when the switch is deactivated.
+- `style: PromptSwitchStyles = PromptSwitchStyles.ROUNDGREEN`: Pick between several sizes, with different colors and rounded or square corners. The value must be from the `SwitchStyles` enum.
+- `startChecked: boolean = false`: If true, the switch starts activated by default.
+- `startHidden: boolean = false`: If true, the switch will be invisible till calling the `show()` function.
 
 <img src="screenshots/switch-styles.png" width="200">
 
-The `addSwitch()` function returns a `CustomPromptSwitch` object, that you can then reference to change and read its values. This object also has the following functions that can be called any time:
+The `addSwitch()` function returns a `PromptSwitch` object, that you can then reference to change and read its values. This object has the following functions that can be called any time:
 
-- `hide`
-- `show`
-- `check`: Sets the element to checked, without performing the associated function.
-- `uncheck`: Sets the element to checked, without performing the associated function.
+- `hide(): void`
+- `show(): void`
+- `check(): void`: Sets the element to checked, **without** performing the associated function.
+- `uncheck(): void`: Sets the element to checked, **without** performing the associated function.
 
-You can also read the returned object's `checked` property at any time to find its current state.
+Switch has components that you can interact with:
+
+- `imageElement: EntityPropTypes`: Props for the `UiEntity` component that is responsible for the switch icon.
+- `labelElement: EntityPropTypes & UiLabelProps`: Props for the `Label` component that is responsible for the switch label.
 
 ### Add an icon
 
 To add an icon to a custom prompt, use the `addIcon` function.
 
 ```ts
-let myIcon = prompt.addIcon(`images/icon.png`, -50, 0, 64, 64)
+const promptIcon = customPrompt.addIcon({
+  image: 'images/scene-thumbnail.png',
+})
 ```
+
+<img src="screenshots/custom-prompt-icon.png" width="400">
 
 The `addIcon` function can take the following parameters:
 
-- `image`: Path to the image file.
-- `xOffset`: Offset on X, relative to the window's center.
-- `yOffset`: Offset on Y, relative to the window's center.
-- `width`: Image width on screen in pixels.
-- `height`: Image height on screen in pixels.
-- `section`: Use only a section of the image file, useful when arranging multiple icons into an image atlas. This field takes an `ImageSection` object, specifying `sourceWidth` and `sourceHeight`, and optionally also `sourceLeft` and `sourceTop`.
+- `image: string`: Path to the image file.
+- `xPosition: number = 0`: Offset on X, relative to the window's center.
+- `yPosition: number = 0`: Offset on Y, relative to the window's center.
+- `width: number = 128`: Image width on screen in pixels.
+- `height: number = 128`: Image height on screen in pixels.
+- `section?: ImageAtlasData`: Use only a section of the image file, useful when arranging multiple icons into an image atlas. This field takes an `ImageAtlasData` object, specifying `sourceWidth`, `sourceHeight`, `sourceLeft`, `sourceTop`, `atlasWidth` and `atlasHeight`.
+- `startHidden: boolean = false`: If true, the switch will be invisible till calling the `show()` function.
 
-The `addIcon()` function returns a `CustomPromptIcon` object, that you can then reference to change its values. This object also has the following functions that can be called any time:
+> Note: you can later change all of this options (except `startHidden`) by accessing the relevant properties of the returned `PromptIcon`.
 
-- `hide`
-- `show`
+The `addIcon()` function returns a `PromptIcon` object, that you can then reference to change its values. This object has the following functions that can be called any time:
+
+- `hide(): void`
+- `show(): void`
+
+Icon components that you can interact with:
+
+- `imageElement: EntityPropTypes`: Props for the underlying `UiEntity` component.
 
 ### Add an input box
 
 To add an input box to a custom prompt, use the `addTextBox` function.
 
 ```ts
-let myInput = prompt.addTextBox(`images/icon.png`, 0, 30)
+const promptTextBox = customPrompt.addTextBox({
+  placeholder: 'Enter text',
+  xPosition: 0,
+  yPosition: 0,
+  onChange: (value) => {
+    console.log('textbox changed', value)
+  },
+})
 ```
+
+<img src="screenshots/custom-prompt-input.png" width="400">
 
 The `addTextBox` function can take the following parameters:
 
-- `posX`: Offset on X, relative to the window's center.
-- `posY`: Offset on Y, relative to the window's center.
-- `placeholder`: Text to display in the input box before the player interacts with it.
-- `onChange`: Function that gets executed every time the player edits the content on the input box, once for each character changed.
+- `xPosition: number`: Offset on X, relative to the window's center.
+- `yPosition: number`: Offset on Y, relative to the window's center.
+- `placeholder: string | number = 'Fill in'`: Text to display in the input box before the player interacts with it.
+- `onChange?: (value: string) => void`: Function that gets executed every time the player edits the content on the input box, once for each character changed.
+- `startHidden: boolean = false`: If true, the switch will be invisible till calling the `show()` function.
 
-The `addTextBox()` function returns a `CustomPromptTextBox` object, that you can then reference to change and read its values. This object also has the following functions that can be called any time:
+> Note: you can later change all of this options (except `startHidden`) by accessing the relevant properties of the returned `PromptInput`.
 
-- `hide`
-- `show`
+The `addTextBox()` function returns a `PromptInput` object, that you can then reference to change and read its values. This object has the following functions that can be called any time:
+
+- `hide(): void`
+- `show(): void`
 
 You can access the last edited value on the textbox by fetching the `currentText` value of the returned object.
+
+Input components that you can interact with:
+
+- `fillInBoxElement: EntityPropTypes & Partial<UiInputProps>`: Props for the underlying `Input` component.
 
 ### Full Custom UI example
 
 Here's a full example of a custom UI:
 
 ```ts
-let prompt = new ui.CustomPrompt(ui.PromptStyles.DARKSLANTED)
-prompt.addText('What will you do?', 0, 130, Color4.Red(), 30)
-prompt.addText("It's an important decision", 0, 100)
+export const customPrompt = new ui.CustomPrompt({
+  style: ui.PromptStyles.DARKSLANTED,
+  height: 600,
+})
 
-let checkBox = prompt.addCheckbox("Don't show again", -80, 50)
+const promptTitle = customPrompt.addText({
+  value: 'What will you do?',
+  xPosition: 0,
+  yPosition: 250,
+  color: Color4.Yellow(),
+  size: 30,
+})
 
-let button1 = prompt.addButton(
-  'Yeah',
-  0,
-  -30,
-  () => {
-    log('Yes')
-    prompt.hide()
+const promptText = customPrompt.addText({
+  value: "It's an important decision",
+  xPosition: 0,
+  yPosition: 200,
+})
+
+const promptCheckbox = customPrompt.addCheckbox({
+  text: "Don't show again",
+  xPosition: -80,
+  yPosition: 150,
+  onCheck: () => {
+    console.log('checkbox checked')
   },
-  ui.ButtonStyles.E
-)
-
-let button2 = prompt.addButton(
-  'Nope',
-  0,
-  -90,
-  () => {
-    log('No')
-    prompt.hide()
+  onUncheck: () => {
+    console.log('checkbox unchecked')
   },
-  ui.ButtonStyles.F
-)
+})
+
+const promptSwitch = customPrompt.addSwitch({
+  text: 'Turn me',
+  xPosition: -60,
+  yPosition: 50,
+  onCheck: () => {
+    console.log('switch checked')
+  },
+  onUncheck: () => {
+    console.log('switch unchecked')
+  },
+})
+
+const promptTextBox = customPrompt.addTextBox({
+  placeholder: 'Enter text',
+  xPosition: 0,
+  yPosition: 100,
+  onChange: (value) => {
+    console.log('textbox changed:', value)
+  },
+})
+
+const promptButtonE = customPrompt.addButton({
+  style: ui.ButtonStyles.E,
+  text: 'Yeah',
+  xPosition: 0,
+  yPosition: -150,
+  onMouseDown: () => {
+    console.log('Yeah clicked')
+  },
+})
+
+const promptButtonF = customPrompt.addButton({
+  style: ui.ButtonStyles.F,
+  text: 'Nope',
+  xPosition: 0,
+  yPosition: -225,
+  onMouseDown: () => {
+    console.log('Nope clicked')
+  },
+})
+
+const promptIcon = customPrompt.addIcon({
+  image: 'images/scene-thumbnail.png',
+  xPosition: 0,
+  yPosition: -50,
+})
+
+customPrompt.show()
+
+// ...
+
+customPrompt.render('my-custom-prompt')
 ```
 
-<img src="screenshots/customPrompt2.png" width="400">
+<img src="screenshots/custom-prompt-full.png" width="400">
 
 ---
 
@@ -570,12 +1043,13 @@ let button2 = prompt.addButton(
 
 In order to test changes made to this repository in active scenes, do the following:
 
-1. Run `npm run link` on this repository
-2. On the scene directory, after you installed the dependency, run `npm link @dcl/ui-scene-utils`
+1. Build the project by running `npm run build`
+2. Run `npm run link` on this repository
+3. On the scene directory, after you installed the dependency, run `npm link @dcl/ui-scene-utils`
 
 ## CI/CD
 
-This repository uses `semantic-release` to atumatically release new versions of the package to NPM.
+This repository uses `semantic-release` to automatically release new versions of the package to NPM.
 
 Use the following convention for commit names:
 
