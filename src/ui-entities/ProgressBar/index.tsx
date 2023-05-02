@@ -8,6 +8,22 @@ import { getImageAtlasMapping } from '../../utils/imageUtils'
 
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../constants/resources'
 
+export type ProgressBarBarElement = Omit<EntityPropTypes, 'uiTransform'> & {
+  uiTransform?: Omit<
+    NonNullable<EntityPropTypes['uiTransform']>,
+    'display' | 'position' | 'width' | 'height'
+  >
+}
+
+export type ProgressBarBackgroundElement = Omit<EntityPropTypes, 'uiBackground'> & {
+  uiBackground?: Omit<NonNullable<EntityPropTypes['uiBackground']>, 'uvs'>
+}
+
+export type ProgressBarProcessElement = Omit<EntityPropTypes, 'uiTransform' | 'uiBackground'> & {
+  uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'position' | 'width' | 'height'>
+  uiBackground?: Omit<NonNullable<EntityPropTypes['uiBackground']>, 'color' | 'uvs'>
+}
+
 export enum BarStyles {
   ROUNDBLACK = `roundBlack`,
   ROUNDWHITE = `roundWhite`,
@@ -16,16 +32,16 @@ export enum BarStyles {
   SQUAREBLACK = `squareBlack`,
   SQUAREWHITE = `squareWhite`,
   SQUARESILVER = `squareSilver`,
-  SQUAREGOLD = `squareGold`
+  SQUAREGOLD = `squareGold`,
 }
 
 export type ProgressBarConfig = UIObjectConfig & {
-  value: number;
-  scale?: number;
-  color?: Color4;
-  xOffset?: number;
-  yOffset?: number;
-  style?: BarStyles;
+  value: number
+  scale?: number
+  color?: Color4
+  xOffset?: number
+  yOffset?: number
+  style?: BarStyles
 }
 
 const progressBarInitialConfig: Required<ProgressBarConfig> = {
@@ -51,9 +67,9 @@ const progressBarInitialConfig: Required<ProgressBarConfig> = {
  *
  */
 export class ProgressBar extends UIObject {
-  public barElement: EntityPropTypes
-  public backgroundElement: EntityPropTypes
-  public processElement: EntityPropTypes
+  public barElement: ProgressBarBarElement
+  public backgroundElement: ProgressBarBackgroundElement
+  public processElement: ProgressBarProcessElement
 
   public scale: number
   public xOffset: number
@@ -76,16 +92,15 @@ export class ProgressBar extends UIObject {
   private _progressPaddingLeft: number | undefined
   private _progressPaddingRight: number | undefined
 
-  constructor(
-    {
-      startHidden = progressBarInitialConfig.startHidden,
-      value = progressBarInitialConfig.value,
-      scale = progressBarInitialConfig.scale,
-      color = progressBarInitialConfig.color,
-      xOffset = progressBarInitialConfig.xOffset,
-      yOffset = progressBarInitialConfig.yOffset,
-      style = progressBarInitialConfig.style,
-    }: ProgressBarConfig) {
+  constructor({
+    startHidden = progressBarInitialConfig.startHidden,
+    value = progressBarInitialConfig.value,
+    scale = progressBarInitialConfig.scale,
+    color = progressBarInitialConfig.color,
+    xOffset = progressBarInitialConfig.xOffset,
+    yOffset = progressBarInitialConfig.yOffset,
+    style = progressBarInitialConfig.style,
+  }: ProgressBarConfig) {
     super({ startHidden })
 
     this.scale = scale
@@ -175,12 +190,11 @@ export class ProgressBar extends UIObject {
     this._width = 128 * this.scale
     this._height = 32 * this.scale
 
-    const isNotDefaultBorders = (
+    const isNotDefaultBorders =
       this.style === BarStyles.ROUNDWHITE ||
       this.style === BarStyles.ROUNDBLACK ||
       this.style === BarStyles.SQUAREWHITE ||
       this.style === BarStyles.SQUAREBLACK
-    )
 
     this._progressPaddingTop = (isNotDefaultBorders ? 3 : 2) * this.scale
     this._progressPaddingBottom = (isNotDefaultBorders ? 3 : 4) * this.scale
@@ -215,7 +229,8 @@ export class ProgressBar extends UIObject {
           {...this.processElement}
           uiTransform={{
             ...this.processElement.uiTransform,
-            width: this._width * this._value - this._progressPaddingLeft - this._progressPaddingRight,
+            width:
+              this._width * this._value - this._progressPaddingLeft - this._progressPaddingRight,
             height: this._progressHeight,
             position: {
               top: this._progressPaddingTop,
@@ -226,7 +241,9 @@ export class ProgressBar extends UIObject {
             ...this.processElement.uiBackground,
             color: this.color,
             uvs: getImageAtlasMapping({
-              ...sourcesComponentsCoordinates.buttons[this.style.startsWith('round') ? 'roundWhite' : 'squareWhite'],
+              ...sourcesComponentsCoordinates.buttons[
+                this.style.startsWith('round') ? 'roundWhite' : 'squareWhite'
+              ],
               atlasHeight: sourcesComponentsCoordinates.atlasHeight,
               atlasWidth: sourcesComponentsCoordinates.atlasWidth,
             }),
@@ -237,6 +254,7 @@ export class ProgressBar extends UIObject {
   }
 
   private _setValueInRange(value: number): void {
-    this._value = (value > this._valueMax) ? this._valueMax : (value < this._valueMin) ? this._valueMin : value
+    this._value =
+      value > this._valueMax ? this._valueMax : value < this._valueMin ? this._valueMin : value
   }
 }

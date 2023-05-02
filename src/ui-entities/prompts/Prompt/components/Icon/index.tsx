@@ -5,26 +5,32 @@ import { InPromptUIObject, InPromptUIObjectConfig } from '../../InPromptUIObject
 
 import { getImageAtlasMapping, ImageAtlasData } from '../../../../../utils/imageUtils'
 
-export type PromptIconConfig = InPromptUIObjectConfig & {
-  image: string;
-  width?: number;
-  height?: number;
-  xPosition?: number;
-  yPosition?: number;
-  section?: ImageAtlasData;
+export type PromptIconImageElementProps = Omit<EntityPropTypes, 'uiTransform' | 'uiBackground'> & {
+  uiTransform?: Omit<
+    NonNullable<EntityPropTypes['uiTransform']>,
+    'width' | 'height' | 'position' | 'display'
+  >
+  uiBackground?: Omit<NonNullable<EntityPropTypes['uiBackground']>, 'uvs'> & {
+    texture?: Omit<NonNullable<NonNullable<EntityPropTypes['uiBackground']>['texture']>, 'src'>
+  }
 }
 
-const promptIconInitialConfig: Omit<Required<PromptIconConfig>, 'section'> = {
+export type PromptIconConfig = InPromptUIObjectConfig & {
+  image: string
+  width?: number
+  height?: number
+  xPosition?: number
+  yPosition?: number
+  section?: ImageAtlasData
+}
+
+const promptIconInitialConfig: Omit<Required<PromptIconConfig>, 'section' | 'parent'> = {
   startHidden: false,
   image: '',
   width: 128,
   height: 128,
   xPosition: 0,
   yPosition: 0,
-  promptVisible: false,
-  promptWidth: 400,
-  promptHeight: 250,
-  darkTheme: false,
 } as const
 
 /**
@@ -39,7 +45,7 @@ const promptIconInitialConfig: Omit<Required<PromptIconConfig>, 'section'> = {
  *
  */
 export class PromptIcon extends InPromptUIObject {
-  public imageElement: EntityPropTypes
+  public imageElement: PromptIconImageElementProps
 
   public image: string
   public width: number
@@ -51,21 +57,20 @@ export class PromptIcon extends InPromptUIObject {
   private _xPosition: number | undefined
   private _yPosition: number | undefined
 
-  constructor(
-    {
-      startHidden = promptIconInitialConfig.startHidden,
-      image = promptIconInitialConfig.image,
-      width = promptIconInitialConfig.width,
-      height = promptIconInitialConfig.height,
-      xPosition = promptIconInitialConfig.xPosition,
-      yPosition = promptIconInitialConfig.yPosition,
-      section,
-      promptVisible = promptIconInitialConfig.promptVisible,
-      promptWidth,
-      promptHeight,
-      darkTheme,
-    }: PromptIconConfig) {
-    super({ startHidden: startHidden || !promptVisible, promptVisible, promptWidth, promptHeight, darkTheme })
+  constructor({
+    section,
+    parent,
+    startHidden = promptIconInitialConfig.startHidden,
+    image = promptIconInitialConfig.image,
+    width = promptIconInitialConfig.width,
+    height = promptIconInitialConfig.height,
+    xPosition = promptIconInitialConfig.xPosition,
+    yPosition = promptIconInitialConfig.yPosition,
+  }: PromptIconConfig) {
+    super({
+      startHidden,
+      parent,
+    })
 
     this.width = width
     this.height = height
@@ -102,7 +107,7 @@ export class PromptIcon extends InPromptUIObject {
         }}
         uiTransform={{
           ...this.imageElement.uiTransform,
-          display: (this.visible && this.promptVisible) ? 'flex' : 'none',
+          display: this.visible ? 'flex' : 'none',
           position: { bottom: this._yPosition, right: this._xPosition * -1 },
           width: this.width,
           height: this.height,

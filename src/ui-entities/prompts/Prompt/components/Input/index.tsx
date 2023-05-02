@@ -7,24 +7,26 @@ import { InPromptUIObject, InPromptUIObjectConfig } from '../../InPromptUIObject
 
 import { defaultFont } from '../../../../../constants/font'
 
+export type PromptInputFillInBoxElementProps = Partial<
+  Omit<UiInputProps, 'onChange' | 'placeholder'>
+> &
+  Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'position' | 'display'>
+  }
+
 export type PromptInputConfig = InPromptUIObjectConfig & {
-  placeholder?: string | number;
-  xPosition: number;
-  yPosition: number;
-  onChange?: (value: string) => void;
+  placeholder?: string | number
+  xPosition: number
+  yPosition: number
+  onChange?: (value: string) => void
 }
 
-const promptInputInitialConfig: Required<PromptInputConfig> = {
+const promptInputInitialConfig: Omit<Required<PromptInputConfig>, 'parent'> = {
   startHidden: false,
   placeholder: 'Fill in',
   xPosition: 0,
   yPosition: 0,
-  onChange: () => {
-  },
-  promptVisible: false,
-  promptWidth: 400,
-  promptHeight: 250,
-  darkTheme: false,
+  onChange: () => {},
 } as const
 
 /**
@@ -37,7 +39,7 @@ const promptInputInitialConfig: Required<PromptInputConfig> = {
  *
  */
 export class PromptInput extends InPromptUIObject {
-  public fillInBoxElement: EntityPropTypes & Partial<UiInputProps>
+  public fillInBoxElement: PromptInputFillInBoxElementProps
 
   public placeholder: string | number
   public xPosition: number
@@ -49,19 +51,18 @@ export class PromptInput extends InPromptUIObject {
   private readonly _width: number
   private readonly _height: number
 
-  constructor(
-    {
-      startHidden = promptInputInitialConfig.startHidden,
-      placeholder = promptInputInitialConfig.placeholder,
-      xPosition = promptInputInitialConfig.xPosition,
-      yPosition = promptInputInitialConfig.yPosition,
-      onChange = promptInputInitialConfig.onChange,
-      promptWidth = promptInputInitialConfig.promptWidth,
-      promptHeight = promptInputInitialConfig.promptHeight,
-      promptVisible = promptInputInitialConfig.promptVisible,
-      darkTheme,
-    }: PromptInputConfig) {
-    super({ startHidden: startHidden || !promptVisible, promptVisible, promptWidth, promptHeight, darkTheme })
+  constructor({
+    parent,
+    startHidden = promptInputInitialConfig.startHidden,
+    placeholder = promptInputInitialConfig.placeholder,
+    xPosition = promptInputInitialConfig.xPosition,
+    yPosition = promptInputInitialConfig.yPosition,
+    onChange = promptInputInitialConfig.onChange,
+  }: PromptInputConfig) {
+    super({
+      startHidden,
+      parent,
+    })
 
     this._width = 312
     this._height = 46
@@ -77,13 +78,10 @@ export class PromptInput extends InPromptUIObject {
         width: this._width,
         height: this._height,
         positionType: 'absolute',
-
       },
-      placeholder: String(this.placeholder),
       fontSize: 22,
       textAlign: 'middle-center',
       font: defaultFont,
-      color: Color4.Black(),
     }
   }
 
@@ -95,9 +93,11 @@ export class PromptInput extends InPromptUIObject {
       <Input
         key={key}
         {...this.fillInBoxElement}
+        placeholder={String(this.placeholder)}
+        color={this.fillInBoxElement.color || (this.isDarkTheme ? Color4.White() : Color4.Black())}
         uiTransform={{
           ...this.fillInBoxElement.uiTransform,
-          display: (this.visible && this.promptVisible) ? 'flex' : 'none',
+          display: this.visible ? 'flex' : 'none',
           position: { bottom: this._yPosition, right: this._xPosition * -1 },
         }}
         onChange={this.onChange}

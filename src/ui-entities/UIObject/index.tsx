@@ -6,26 +6,31 @@ export interface UIObjectInterface {
   /**
    * Returns UiEntity.
    */
-  render(key?: string): ReactEcs.JSX.Element;
+  render(key?: string): ReactEcs.JSX.Element
 
   /**
    * Makes an invisible visible.
    */
-  show(): void;
+  show(): void
 
   /**
    * Makes an invisible visible with delayed hiding.
    */
-  show(duration?: number): void;
+  show(duration?: number): void
 
   /**
    * Makes visible an invisible.
    */
-  hide(): void;
+  hide(): void
+
+  /**
+   * Returns the visibility of the object
+   */
+  isVisible(): boolean
 }
 
 export type UIObjectConfig = {
-  startHidden?: boolean;
+  startHidden?: boolean
 }
 
 export abstract class UIObject implements UIObjectInterface {
@@ -45,10 +50,14 @@ export abstract class UIObject implements UIObjectInterface {
   public hide(): void {
     this.visible = false
   }
+
+  public isVisible(): boolean {
+    return this.visible
+  }
 }
 
 export type DelayedHidingUIObjectConfig = UIObjectConfig & {
-  duration?: number;
+  duration?: number
 }
 
 export abstract class DelayedHidingUIObject extends UIObject {

@@ -10,39 +10,38 @@ import { getImageAtlasMapping } from '../../../../../utils/imageUtils'
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../../constants/resources'
 import { defaultFont } from '../../../../../constants/font'
 
+export type PromptSwitchLabelElementProps = EntityPropTypes & Omit<UiLabelProps, 'value'>
+
+export type PromptSwitchImageElementProps = Omit<EntityPropTypes, 'uiBackground'> & {
+  uiBackground?: Omit<NonNullable<EntityPropTypes['uiBackground']>, 'uvs'>
+}
+
 export enum PromptSwitchStyles {
   ROUNDGREEN = `roundGreen`,
   ROUNDRED = `roundRed`,
   SQUAREGREEN = `squareGreen`,
-  SQUARERED = `squareRed`
+  SQUARERED = `squareRed`,
 }
 
 export type PromptSwitchConfig = InPromptUIObjectConfig & {
-  text: string | number;
-  xPosition: number;
-  yPosition: number;
-  onCheck?: () => void;
-  onUncheck?: () => void;
-  darkTheme?: boolean;
-  startChecked?: boolean;
-  style?: PromptSwitchStyles;
+  text: string | number
+  xPosition: number
+  yPosition: number
+  onCheck?: () => void
+  onUncheck?: () => void
+  startChecked?: boolean
+  style?: PromptSwitchStyles
 }
 
-const promptSwitchInitialConfig: Required<PromptSwitchConfig> = {
+const promptSwitchInitialConfig: Omit<Required<PromptSwitchConfig>, 'parent'> = {
   startHidden: false,
   text: '',
   xPosition: 0,
   yPosition: 0,
-  onCheck: () => {
-  },
-  onUncheck: () => {
-  },
+  onCheck: () => {},
+  onUncheck: () => {},
   startChecked: false,
   style: PromptSwitchStyles.ROUNDGREEN,
-  promptVisible: false,
-  promptWidth: 400,
-  promptHeight: 250,
-  darkTheme: false,
 } as const
 
 /**
@@ -57,8 +56,8 @@ const promptSwitchInitialConfig: Required<PromptSwitchConfig> = {
  *
  */
 export class PromptSwitch extends InPromptUIObject {
-  public imageElement: EntityPropTypes
-  public labelElement: EntityPropTypes & UiLabelProps
+  public imageElement: PromptSwitchImageElementProps
+  public labelElement: PromptSwitchLabelElementProps
 
   public text: string | number
   public xPosition: number
@@ -72,22 +71,21 @@ export class PromptSwitch extends InPromptUIObject {
   private _xPosition: number | undefined
   private _yPosition: number | undefined
 
-  constructor(
-    {
-      startHidden = promptSwitchInitialConfig.startHidden,
-      text = promptSwitchInitialConfig.text,
-      xPosition = promptSwitchInitialConfig.xPosition,
-      yPosition = promptSwitchInitialConfig.yPosition,
-      onCheck = promptSwitchInitialConfig.onCheck,
-      onUncheck = promptSwitchInitialConfig.onUncheck,
-      startChecked = promptSwitchInitialConfig.startChecked,
-      darkTheme = promptSwitchInitialConfig.darkTheme,
-      style = promptSwitchInitialConfig.style,
-      promptWidth = promptSwitchInitialConfig.promptWidth,
-      promptHeight = promptSwitchInitialConfig.promptHeight,
-      promptVisible = promptSwitchInitialConfig.promptVisible,
-    }: PromptSwitchConfig) {
-    super({ startHidden: startHidden || !promptVisible, promptVisible, promptWidth, promptHeight, darkTheme })
+  constructor({
+    parent,
+    startHidden = promptSwitchInitialConfig.startHidden,
+    text = promptSwitchInitialConfig.text,
+    xPosition = promptSwitchInitialConfig.xPosition,
+    yPosition = promptSwitchInitialConfig.yPosition,
+    onCheck = promptSwitchInitialConfig.onCheck,
+    onUncheck = promptSwitchInitialConfig.onUncheck,
+    startChecked = promptSwitchInitialConfig.startChecked,
+    style = promptSwitchInitialConfig.style,
+  }: PromptSwitchConfig) {
+    super({
+      startHidden,
+      parent,
+    })
 
     this.text = text
     this.xPosition = xPosition
@@ -116,7 +114,6 @@ export class PromptSwitch extends InPromptUIObject {
     }
 
     this.labelElement = {
-      value: String(this.text),
       uiTransform: {
         maxWidth: '100%',
         height: '100%',
@@ -142,14 +139,14 @@ export class PromptSwitch extends InPromptUIObject {
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
-    this._xPosition = (this.promptWidth / -2) + (this.promptWidth / 2) + this.xPosition
-    this._yPosition = (this.promptHeight / 2) + (32 / -2) + this.yPosition
+    this._xPosition = this.promptWidth / -2 + this.promptWidth / 2 + this.xPosition
+    this._yPosition = this.promptHeight / 2 + 32 / -2 + this.yPosition
 
     return (
       <UiEntity
         key={key}
         uiTransform={{
-          display: (this.visible && this.promptVisible) ? 'flex' : 'none',
+          display: this.visible ? 'flex' : 'none',
           width: '100%',
           height: 32,
           flexDirection: 'row',
@@ -158,22 +155,23 @@ export class PromptSwitch extends InPromptUIObject {
           positionType: 'absolute',
           position: { bottom: this._yPosition, right: this._xPosition * -1 },
         }}
-        onMouseDown={this._click}
       >
         <UiEntity
           {...this.imageElement}
           uiBackground={{
-            ...this.imageElement.uiBackground, uvs: getImageAtlasMapping({
+            ...this.imageElement.uiBackground,
+            uvs: getImageAtlasMapping({
               ...sourcesComponentsCoordinates.switches[this._getImageStyle()],
               atlasHeight: sourcesComponentsCoordinates.atlasHeight,
               atlasWidth: sourcesComponentsCoordinates.atlasWidth,
             }),
           }}
+          onMouseDown={this._click}
         />
         <Label
           {...this.labelElement}
           value={String(this.text)}
-          color={this.labelElement.color || this.darkTheme ? Color4.White() : Color4.Black()}
+          color={this.labelElement.color || (this.isDarkTheme ? Color4.White() : Color4.Black())}
         />
       </UiEntity>
     )
@@ -183,7 +181,10 @@ export class PromptSwitch extends InPromptUIObject {
     if (this._checked) {
       return this.style
     } else {
-      if (this.style == PromptSwitchStyles.ROUNDGREEN || this.style == PromptSwitchStyles.ROUNDRED) {
+      if (
+        this.style == PromptSwitchStyles.ROUNDGREEN ||
+        this.style == PromptSwitchStyles.ROUNDRED
+      ) {
         return 'roundOff'
       } else {
         return 'squareOff'
@@ -199,5 +200,7 @@ export class PromptSwitch extends InPromptUIObject {
       this.uncheck()
       this.onUncheck()
     }
+
+    this.imageElement.onMouseDown?.()
   }
 }

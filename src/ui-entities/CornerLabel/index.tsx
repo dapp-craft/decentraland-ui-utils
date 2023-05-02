@@ -7,12 +7,17 @@ import { UIObject, UIObjectConfig } from '../UIObject'
 
 import { defaultFont } from '../../constants/font'
 
+export type CornerLabelTextElement = Omit<UiLabelProps, 'value' | 'fontSize' | 'color'> &
+  Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'display' | 'position'>
+  }
+
 export type CornerLabelConfig = UIObjectConfig & {
-  value: string | number;
-  xOffset?: number;
-  yOffset?: number;
-  color?: Color4;
-  size?: number;
+  value: string | number
+  xOffset?: number
+  yOffset?: number
+  color?: Color4
+  size?: number
 }
 
 const cornerLabelInitialConfig: Required<CornerLabelConfig> = {
@@ -36,7 +41,7 @@ const cornerLabelInitialConfig: Required<CornerLabelConfig> = {
  *
  */
 export class CornerLabel extends UIObject {
-  public textElement: EntityPropTypes & UiLabelProps
+  public textElement: CornerLabelTextElement
 
   public xOffset: number
   public yOffset: number
@@ -45,15 +50,14 @@ export class CornerLabel extends UIObject {
 
   private _value: string | number
 
-  constructor(
-    {
-      startHidden = cornerLabelInitialConfig.startHidden,
-      value = cornerLabelInitialConfig.value,
-      xOffset = cornerLabelInitialConfig.xOffset,
-      yOffset = cornerLabelInitialConfig.yOffset,
-      color = cornerLabelInitialConfig.color,
-      size = cornerLabelInitialConfig.size,
-    }: CornerLabelConfig) {
+  constructor({
+    startHidden = cornerLabelInitialConfig.startHidden,
+    value = cornerLabelInitialConfig.value,
+    xOffset = cornerLabelInitialConfig.xOffset,
+    yOffset = cornerLabelInitialConfig.yOffset,
+    color = cornerLabelInitialConfig.color,
+    size = cornerLabelInitialConfig.size,
+  }: CornerLabelConfig) {
     super({ startHidden })
 
     this.xOffset = xOffset
@@ -64,7 +68,6 @@ export class CornerLabel extends UIObject {
     this._value = value
 
     this.textElement = {
-      value: String(this._value),
       textAlign: 'bottom-right',
       font: defaultFont,
       uiTransform: {

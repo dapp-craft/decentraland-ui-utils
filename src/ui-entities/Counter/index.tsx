@@ -9,13 +9,18 @@ import { toFixedLengthStringUtil } from '../../utils/textUtils'
 
 import { defaultFont } from '../../constants/font'
 
+export type CounterTextElement = Omit<UiLabelProps, 'value' | 'fontSize' | 'color'> &
+  Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'display' | 'position'>
+  }
+
 export type CounterConfig = UIObjectConfig & {
-  value: number;
-  xOffset?: number;
-  yOffset?: number;
-  color?: Color4;
-  size?: number;
-  fixedDigits?: number;
+  value: number
+  xOffset?: number
+  yOffset?: number
+  color?: Color4
+  size?: number
+  fixedDigits?: number
 }
 
 const counterInitialConfig: Required<CounterConfig> = {
@@ -41,7 +46,7 @@ const counterInitialConfig: Required<CounterConfig> = {
  *
  */
 export class Counter extends UIObject {
-  public textElement: EntityPropTypes & UiLabelProps
+  public textElement: CounterTextElement
 
   public xOffset: number
   public yOffset: number
@@ -52,16 +57,15 @@ export class Counter extends UIObject {
   private _value: number
   private readonly _valueStep: number
 
-  constructor(
-    {
-      startHidden = counterInitialConfig.startHidden,
-      value = counterInitialConfig.value,
-      xOffset = counterInitialConfig.xOffset,
-      yOffset = counterInitialConfig.yOffset,
-      color = counterInitialConfig.color,
-      size = counterInitialConfig.size,
-      fixedDigits = counterInitialConfig.fixedDigits,
-    }: CounterConfig) {
+  constructor({
+    startHidden = counterInitialConfig.startHidden,
+    value = counterInitialConfig.value,
+    xOffset = counterInitialConfig.xOffset,
+    yOffset = counterInitialConfig.yOffset,
+    color = counterInitialConfig.color,
+    size = counterInitialConfig.size,
+    fixedDigits = counterInitialConfig.fixedDigits,
+  }: CounterConfig) {
     super({ startHidden })
 
     this.xOffset = xOffset
@@ -75,12 +79,6 @@ export class Counter extends UIObject {
     this._valueStep = 1
 
     this.textElement = {
-      value: toFixedLengthStringUtil(
-        {
-          value: this._value,
-          fixedDigits: this.fixedDigits,
-        },
-      ),
       textAlign: 'bottom-right',
       font: defaultFont,
       uiTransform: {
@@ -130,14 +128,10 @@ export class Counter extends UIObject {
         {...this.textElement}
         fontSize={this.size}
         color={this.color}
-        value={
-          toFixedLengthStringUtil(
-            {
-              value: this._value,
-              fixedDigits: this.fixedDigits,
-            },
-          )
-        }
+        value={toFixedLengthStringUtil({
+          value: this._value,
+          fixedDigits: this.fixedDigits,
+        })}
         uiTransform={{
           ...this.textElement.uiTransform,
           display: this.visible ? 'flex' : 'none',

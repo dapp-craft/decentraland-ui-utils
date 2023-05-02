@@ -7,13 +7,18 @@ import { DelayedHidingUIObject, DelayedHidingUIObjectConfig } from '../UIObject'
 
 import { defaultFont } from '../../constants/font'
 
+export type AnnouncementTextElement = Omit<UiLabelProps, 'value' | 'fontSize' | 'color'> &
+  Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'margin' | 'display'>
+  }
+
 export type AnnouncementConfig = DelayedHidingUIObjectConfig & {
-  value: string | number;
-  duration?: number;
-  xOffset?: number;
-  yOffset?: number;
-  color?: Color4;
-  size?: number;
+  value: string | number
+  duration?: number
+  xOffset?: number
+  yOffset?: number
+  color?: Color4
+  size?: number
 }
 
 const announcementInitialConfig: Required<AnnouncementConfig> = {
@@ -39,25 +44,23 @@ const announcementInitialConfig: Required<AnnouncementConfig> = {
  *
  */
 export class Announcement extends DelayedHidingUIObject {
-  public textElement: EntityPropTypes & UiLabelProps
+  public textElement: AnnouncementTextElement
 
   public xOffset: number
   public yOffset: number
   public color: Color4
   public size: number
+  public value: string | number
 
-  private readonly _value: string | number
-
-  constructor(
-    {
-      startHidden = announcementInitialConfig.startHidden,
-      value = announcementInitialConfig.value,
-      duration = announcementInitialConfig.duration,
-      xOffset = announcementInitialConfig.xOffset,
-      yOffset = announcementInitialConfig.yOffset,
-      color = announcementInitialConfig.color,
-      size = announcementInitialConfig.size,
-    }: AnnouncementConfig) {
+  constructor({
+    startHidden = announcementInitialConfig.startHidden,
+    value = announcementInitialConfig.value,
+    duration = announcementInitialConfig.duration,
+    xOffset = announcementInitialConfig.xOffset,
+    yOffset = announcementInitialConfig.yOffset,
+    color = announcementInitialConfig.color,
+    size = announcementInitialConfig.size,
+  }: AnnouncementConfig) {
     super({ startHidden, duration })
 
     this.xOffset = xOffset
@@ -65,10 +68,9 @@ export class Announcement extends DelayedHidingUIObject {
     this.color = color
     this.size = size
 
-    this._value = value
+    this.value = value
 
     this.textElement = {
-      value: String(this._value),
       textAlign: 'bottom-center',
       font: defaultFont,
       uiTransform: {
@@ -84,8 +86,8 @@ export class Announcement extends DelayedHidingUIObject {
         key={key}
         {...this.textElement}
         fontSize={this.size}
-        color={this.textElement.color || this.color}
-        value={String(this._value)}
+        color={this.color}
+        value={String(this.value)}
         uiTransform={{
           ...this.textElement.uiTransform,
           display: this.visible ? 'flex' : 'none',

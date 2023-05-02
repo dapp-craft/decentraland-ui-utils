@@ -5,14 +5,22 @@ import { DelayedHidingUIObject, DelayedHidingUIObjectConfig } from '../UIObject'
 
 import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
 
+export type CenterImageImageElement = Omit<EntityPropTypes, 'uiTransform' | 'uiBackground'> & {
+  uiTransform?: Omit<
+    NonNullable<EntityPropTypes['uiTransform']>,
+    'display' | 'width' | 'height' | 'margin'
+  >
+  uiBackground?: Omit<NonNullable<EntityPropTypes['uiBackground']>, 'texture' | 'uvs'>
+}
+
 type CenterImageConfig = DelayedHidingUIObjectConfig & {
-  image: string;
-  duration: number;
-  width?: number;
-  height?: number;
-  xOffset?: number;
-  yOffset?: number;
-  section?: ImageAtlasData;
+  image: string
+  duration: number
+  width?: number
+  height?: number
+  xOffset?: number
+  yOffset?: number
+  section?: ImageAtlasData
 }
 
 const centerImageInitialConfig: Omit<Required<CenterImageConfig>, 'section'> = {
@@ -39,7 +47,7 @@ const centerImageInitialConfig: Omit<Required<CenterImageConfig>, 'section'> = {
  *
  */
 export class CenterImage extends DelayedHidingUIObject {
-  public imageElement: EntityPropTypes
+  public imageElement: CenterImageImageElement
 
   public image: string
   public width: number
@@ -48,17 +56,16 @@ export class CenterImage extends DelayedHidingUIObject {
   public yOffset: number
   public section: ImageAtlasData | undefined
 
-  constructor(
-    {
-      startHidden = centerImageInitialConfig.startHidden,
-      image = centerImageInitialConfig.image,
-      duration = centerImageInitialConfig.duration,
-      width = centerImageInitialConfig.width,
-      height = centerImageInitialConfig.height,
-      xOffset = centerImageInitialConfig.xOffset,
-      yOffset = centerImageInitialConfig.yOffset,
-      section,
-    }: CenterImageConfig) {
+  constructor({
+    startHidden = centerImageInitialConfig.startHidden,
+    image = centerImageInitialConfig.image,
+    duration = centerImageInitialConfig.duration,
+    width = centerImageInitialConfig.width,
+    height = centerImageInitialConfig.height,
+    xOffset = centerImageInitialConfig.xOffset,
+    yOffset = centerImageInitialConfig.yOffset,
+    section,
+  }: CenterImageConfig) {
     super({ startHidden, duration })
 
     this.image = image

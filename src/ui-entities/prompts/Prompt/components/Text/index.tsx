@@ -7,26 +7,26 @@ import { InPromptUIObject, InPromptUIObjectConfig } from '../../InPromptUIObject
 
 import { defaultFont } from '../../../../../constants/font'
 
+export type PromptTextTextElementProps = Omit<UiLabelProps, 'value' | 'color' | 'fontSize'> &
+  Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'display' | 'margin'>
+  }
+
 export type PromptTextConfig = InPromptUIObjectConfig & {
-  value: string | number;
-  xPosition: number;
-  yPosition: number;
-  darkTheme?: boolean;
-  color?: Color4;
-  size?: number;
+  value: string | number
+  xPosition: number
+  yPosition: number
+  color?: Color4
+  size?: number
 }
 
-const promptTextInitialConfig: Required<PromptTextConfig> = {
+const promptTextInitialConfig: Omit<Required<PromptTextConfig>, 'parent'> = {
   startHidden: false,
   value: '',
   xPosition: 0,
   yPosition: 0,
   color: Color4.Black(),
   size: 15,
-  promptVisible: false,
-  promptWidth: 400,
-  promptHeight: 250,
-  darkTheme: false,
 } as const
 
 /**
@@ -41,7 +41,7 @@ const promptTextInitialConfig: Required<PromptTextConfig> = {
  *
  */
 export class PromptText extends InPromptUIObject {
-  public textElement: EntityPropTypes & UiLabelProps
+  public textElement: PromptTextTextElementProps
 
   public value: string | number
   public xPosition: number
@@ -49,20 +49,19 @@ export class PromptText extends InPromptUIObject {
   public color: Color4 | undefined
   public size: number
 
-  constructor(
-    {
-      startHidden = promptTextInitialConfig.startHidden,
-      value = promptTextInitialConfig.value,
-      xPosition = promptTextInitialConfig.xPosition,
-      yPosition = promptTextInitialConfig.yPosition,
-      darkTheme = promptTextInitialConfig.darkTheme,
-      color,
-      size = promptTextInitialConfig.size,
-      promptVisible = promptTextInitialConfig.promptVisible,
-      promptWidth,
-      promptHeight,
-    }: PromptTextConfig) {
-    super({ startHidden: startHidden || !promptVisible, promptVisible, promptWidth, promptHeight, darkTheme })
+  constructor({
+    color,
+    parent,
+    startHidden = promptTextInitialConfig.startHidden,
+    value = promptTextInitialConfig.value,
+    xPosition = promptTextInitialConfig.xPosition,
+    yPosition = promptTextInitialConfig.yPosition,
+    size = promptTextInitialConfig.size,
+  }: PromptTextConfig) {
+    super({
+      startHidden,
+      parent,
+    })
 
     this.value = value
     this.xPosition = xPosition
@@ -71,7 +70,6 @@ export class PromptText extends InPromptUIObject {
     this.size = size
 
     this.textElement = {
-      value: String(this.value),
       uiTransform: {
         maxWidth: '100%',
         positionType: 'absolute',
@@ -88,11 +86,11 @@ export class PromptText extends InPromptUIObject {
         key={key}
         {...this.textElement}
         value={String(this.value)}
-        color={this.color || this.darkTheme ? Color4.White() : promptTextInitialConfig.color}
+        color={this.color || (this.isDarkTheme ? Color4.White() : promptTextInitialConfig.color)}
         fontSize={this.size}
         uiTransform={{
           ...this.textElement.uiTransform,
-          display: (this.visible && this.promptVisible) ? 'flex' : 'none',
+          display: this.visible ? 'flex' : 'none',
           margin: { left: this.xPosition, top: this.yPosition * -1 },
         }}
       />

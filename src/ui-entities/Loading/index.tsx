@@ -7,16 +7,24 @@ import { getImageAtlasMapping } from '../../utils/imageUtils'
 
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../constants/resources'
 
+export type LoadingImageElement = Omit<EntityPropTypes, 'uiTransform' | 'uiBackground'> & {
+  uiTransform?: Omit<
+    NonNullable<EntityPropTypes['uiTransform']>,
+    'display' | 'margin' | 'width' | 'height'
+  >
+  uiBackground?: Omit<NonNullable<EntityPropTypes['uiBackground']>, 'texture' | 'uvs'>
+}
+
 type LoadingConfig = DelayedHidingUIObjectConfig & {
-  duration?: number;
-  xOffset?: number;
-  yOffset?: number;
-  scale?: number;
+  duration?: number
+  xOffset?: number
+  yOffset?: number
+  scale?: number
 }
 
 type LoadingSizeConfig = {
-  width: number;
-  height: number;
+  width: number
+  height: number
 }
 
 const loadingInitialConfig: Required<LoadingConfig & LoadingSizeConfig> = {
@@ -39,7 +47,7 @@ const loadingInitialConfig: Required<LoadingConfig & LoadingSizeConfig> = {
  *
  */
 export class Loading extends DelayedHidingUIObject {
-  public imageElement: EntityPropTypes
+  public imageElement: LoadingImageElement
 
   public xOffset: number
   public yOffset: number
@@ -48,14 +56,13 @@ export class Loading extends DelayedHidingUIObject {
   private _width: number | undefined
   private _height: number | undefined
 
-  constructor(
-    {
-      startHidden = loadingInitialConfig.startHidden,
-      duration = loadingInitialConfig.duration,
-      xOffset = loadingInitialConfig.xOffset,
-      yOffset = loadingInitialConfig.yOffset,
-      scale = loadingInitialConfig.scale,
-    }: LoadingConfig | undefined = {}) {
+  constructor({
+    startHidden = loadingInitialConfig.startHidden,
+    duration = loadingInitialConfig.duration,
+    xOffset = loadingInitialConfig.xOffset,
+    yOffset = loadingInitialConfig.yOffset,
+    scale = loadingInitialConfig.scale,
+  }: LoadingConfig | undefined = {}) {
     super({ startHidden, duration })
 
     this.xOffset = xOffset
@@ -69,14 +76,6 @@ export class Loading extends DelayedHidingUIObject {
       },
       uiBackground: {
         textureMode: 'stretch',
-        texture: {
-          src: AtlasTheme.ATLAS_PATH_LIGHT,
-        },
-        uvs: getImageAtlasMapping({
-          ...sourcesComponentsCoordinates.icons['TimerLarge'],
-          atlasHeight: sourcesComponentsCoordinates.atlasHeight,
-          atlasWidth: sourcesComponentsCoordinates.atlasWidth,
-        }),
       },
     }
   }
@@ -89,12 +88,26 @@ export class Loading extends DelayedHidingUIObject {
       <UiEntity
         key={key}
         {...this.imageElement}
+        uiBackground={{
+          ...this.imageElement.uiBackground,
+          texture: {
+            src: AtlasTheme.ATLAS_PATH_LIGHT,
+          },
+          uvs: getImageAtlasMapping({
+            ...sourcesComponentsCoordinates.icons['TimerLarge'],
+            atlasHeight: sourcesComponentsCoordinates.atlasHeight,
+            atlasWidth: sourcesComponentsCoordinates.atlasWidth,
+          }),
+        }}
         uiTransform={{
           ...this.imageElement.uiTransform,
           width: this._width,
           height: this._height,
           display: this.visible ? 'flex' : 'none',
-          margin: { top: this.yOffset * -1 - this._height / 2, left: this.xOffset - this._width / 2 },
+          margin: {
+            top: this.yOffset * -1 - this._height / 2,
+            left: this.xOffset - this._width / 2,
+          },
         }}
       />
     )

@@ -11,8 +11,6 @@ export const customPrompt = new ui.CustomPrompt(
   },
 )
 
-customPrompt.width = 800
-
 const promptTitle = customPrompt.addText({
   value: 'What will you do?',
   xPosition: 0,
@@ -20,8 +18,6 @@ const promptTitle = customPrompt.addText({
   color: Color4.Yellow(),
   size: 30,
 })
-
-promptTitle.textElement.textAlign = 'bottom-center'
 
 const promptIcon = customPrompt.addIcon({
   image: 'images/scene-thumbnail.png',
@@ -35,8 +31,6 @@ const promptText = customPrompt.addText({
   yPosition: 50,
 })
 
-promptText.textElement.textAlign = 'top-right'
-
 const promptTextBox = customPrompt.addTextBox({
   placeholder: 'Enter text',
   xPosition: 0,
@@ -45,8 +39,6 @@ const promptTextBox = customPrompt.addTextBox({
     console.log('addTextBox onChange')
   },
 })
-
-promptTextBox.fillInBoxElement.placeholderColor = Color4.Yellow()
 
 const promptCheckbox = customPrompt.addCheckbox({
   text: 'Don\'t show again',
@@ -60,8 +52,6 @@ const promptCheckbox = customPrompt.addCheckbox({
   },
 })
 
-promptCheckbox.labelElement.fontSize = 12
-
 const promptSwitch = customPrompt.addSwitch({
   text: 'Turn me',
   xPosition: -60,
@@ -74,8 +64,6 @@ const promptSwitch = customPrompt.addSwitch({
   },
 })
 
-promptSwitch.labelElement.color = Color4.Green()
-
 const promptButtonE = customPrompt.addButton({
   style: ui.ButtonStyles.E,
   text: 'Yeah',
@@ -85,8 +73,6 @@ const promptButtonE = customPrompt.addButton({
     console.log('addButton onMouseDown')
   },
 })
-
-promptButtonE.labelElement.color = Color4.Yellow()
 
 const promptButtonF = customPrompt.addButton({
   style: ui.ButtonStyles.F,
@@ -98,6 +84,20 @@ const promptButtonF = customPrompt.addButton({
   },
 })
 
+customPrompt.hide()
+
 // customPrompt.show()
 
-customPrompt.closeIcon.hide()
+customPrompt.width = 800
+
+promptTitle.textElement.textAlign = 'bottom-center'
+
+promptText.textElement.textAlign = 'top-right'
+
+promptTextBox.fillInBoxElement.placeholderColor = Color4.Yellow()
+
+promptCheckbox.labelElement.fontSize = 12
+
+promptButtonE.labelElement.color = Color4.Yellow()
+
+promptSwitch.labelElement.color = Color4.Green()

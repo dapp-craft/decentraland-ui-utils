@@ -1,30 +1,34 @@
 import ReactEcs from '@dcl/sdk/react-ecs'
 
 import { UIObject, UIObjectConfig } from '../../../UIObject'
+import { IPrompt } from '../IPrompt'
 
 export type InPromptUIObjectConfig = UIObjectConfig & {
-  promptVisible: boolean;
-  promptWidth: number;
-  promptHeight: number;
-  darkTheme: boolean;
+  parent: IPrompt
 }
 
 export abstract class InPromptUIObject extends UIObject {
-  public promptVisible: boolean
-  public promptWidth: number
-  public promptHeight: number
-  public darkTheme: boolean
+  protected parent: IPrompt
 
-  protected constructor({ promptVisible, promptWidth, promptHeight, darkTheme, ...config }: InPromptUIObjectConfig) {
+  protected constructor({ parent, ...config }: InPromptUIObjectConfig) {
     super(config)
 
-    this.promptVisible = promptVisible
-    this.promptWidth = promptWidth
-    this.promptHeight = promptHeight
-    this.darkTheme = darkTheme
+    this.parent = parent
   }
 
-  public changedPromptVisible(visible: boolean): void {
-    this.promptVisible = visible
+  protected get promptWidth() {
+    return this.parent.realWidth()
+  }
+
+  protected get promptHeight() {
+    return this.parent.realHeight()
+  }
+
+  protected get isDarkTheme() {
+    return this.parent.isDarkTheme
+  }
+
+  protected get isPromptVisible() {
+    return this.parent.isVisible()
   }
 }

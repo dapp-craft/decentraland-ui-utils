@@ -13,6 +13,16 @@ import { getImageAtlasMapping } from '../../../../../utils/imageUtils'
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../../constants/resources'
 import { defaultFont } from '../../../../../constants/font'
 
+export type PromptButtonLabelElementProps = EntityPropTypes & Omit<UiLabelProps, 'value'>
+
+export type PromptButtonIconElementProps = Omit<EntityPropTypes, 'uiTransform'> & {
+  uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'margin' | 'display'>
+}
+
+export type PromptButtonImageElementProps = Omit<EntityPropTypes, 'uiTransform' | 'onMouseDown'> & {
+  uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'position' | 'display'>
+}
+
 export enum PromptButtonStyles {
   E = `E`,
   F = `F`,
@@ -25,7 +35,7 @@ export enum PromptButtonStyles {
   SQUAREBLACK = `squareBlack`,
   SQUAREWHITE = `squareWhite`,
   SQUARESILVER = `squareSilver`,
-  SQUAREGOLD = `squareGold`
+  SQUAREGOLD = `squareGold`,
 }
 
 enum PromptButtonCustomBgStyles {
@@ -34,27 +44,20 @@ enum PromptButtonCustomBgStyles {
 }
 
 export type PromptButtonConfig = InPromptUIObjectConfig & {
-  text: string | number;
-  xPosition: number;
-  yPosition: number;
-  onMouseDown: Callback;
-  style?: PromptButtonStyles;
-  promptWidth: number;
-  promptHeight: number;
+  text: string | number
+  xPosition: number
+  yPosition: number
+  onMouseDown: Callback
+  style?: PromptButtonStyles
 }
 
-const promptButtonInitialConfig: Required<PromptButtonConfig> = {
+const promptButtonInitialConfig: Omit<Required<PromptButtonConfig>, 'parent'> = {
   startHidden: false,
   text: '',
   xPosition: 0,
   yPosition: 0,
-  onMouseDown: () => {
-  },
+  onMouseDown: () => {},
   style: PromptButtonStyles.ROUNDSILVER,
-  promptVisible: false,
-  promptWidth: 400,
-  promptHeight: 250,
-  darkTheme: false,
 } as const
 
 /**
@@ -68,9 +71,9 @@ const promptButtonInitialConfig: Required<PromptButtonConfig> = {
  *
  */
 export class PromptButton extends InPromptUIObject {
-  public labelElement: EntityPropTypes & UiLabelProps
-  public imageElement: EntityPropTypes
-  public iconElement: EntityPropTypes
+  public labelElement: PromptButtonLabelElementProps
+  public imageElement: PromptButtonImageElementProps
+  public iconElement: PromptButtonIconElementProps
 
   public text: string | number
   public xPosition: number
@@ -89,20 +92,19 @@ export class PromptButton extends InPromptUIObject {
   private readonly _isFStyle: boolean
   private _buttonSystemInputAction: SystemInputActions | undefined
 
-  constructor(
-    {
-      startHidden = promptButtonInitialConfig.startHidden,
-      text = promptButtonInitialConfig.text,
-      xPosition = promptButtonInitialConfig.xPosition,
-      yPosition = promptButtonInitialConfig.yPosition,
-      onMouseDown = promptButtonInitialConfig.onMouseDown,
-      style = promptButtonInitialConfig.style,
-      promptVisible = promptButtonInitialConfig.promptVisible,
-      promptWidth,
-      promptHeight,
-      darkTheme,
-    }: PromptButtonConfig) {
-    super({ startHidden: startHidden || !promptVisible, promptVisible, promptWidth, promptHeight, darkTheme })
+  constructor({
+    parent,
+    startHidden = promptButtonInitialConfig.startHidden,
+    text = promptButtonInitialConfig.text,
+    xPosition = promptButtonInitialConfig.xPosition,
+    yPosition = promptButtonInitialConfig.yPosition,
+    onMouseDown = promptButtonInitialConfig.onMouseDown,
+    style = promptButtonInitialConfig.style,
+  }: PromptButtonConfig) {
+    super({
+      startHidden,
+      parent,
+    })
 
     this.text = text
     this.xPosition = xPosition
@@ -133,12 +135,12 @@ export class PromptButton extends InPromptUIObject {
     }
 
     this._labelDisabledColor = Color4.Gray()
-    this._labelColor = this._style == PromptButtonStyles.ROUNDWHITE || this._style == PromptButtonStyles.SQUAREWHITE
-      ? Color4.Black()
-      : Color4.White()
+    this._labelColor =
+      this._style == PromptButtonStyles.ROUNDWHITE || this._style == PromptButtonStyles.SQUAREWHITE
+        ? Color4.Black()
+        : Color4.White()
 
     this.labelElement = {
-      value: String(this.text),
       font: defaultFont,
       fontSize: 20,
       textAlign: 'middle-center',
@@ -199,16 +201,6 @@ export class PromptButton extends InPromptUIObject {
     this._createSystemInputAction()
   }
 
-  public changedPromptVisible(visible: boolean): void {
-    super.changedPromptVisible(visible)
-
-    if (visible) {
-      this._createSystemInputAction()
-    } else {
-      this._clearSystemInputAction()
-    }
-  }
-
   public show(): void {
     super.show()
 
@@ -239,7 +231,7 @@ export class PromptButton extends InPromptUIObject {
         {...this.imageElement}
         uiTransform={{
           ...this.imageElement.uiTransform,
-          display: (this.visible && this.promptVisible) ? 'flex' : 'none',
+          display: this.visible ? 'flex' : 'none',
           position: { bottom: this._yPosition, right: this._xPosition * -1 },
         }}
         onMouseDown={() => {
@@ -251,7 +243,7 @@ export class PromptButton extends InPromptUIObject {
           {...this.iconElement}
           uiTransform={{
             ...this.iconElement.uiTransform,
-            display: (this._disabled || (!this._isEStyle && !this._isFStyle)) ? 'none' : 'flex',
+            display: this._disabled || (!this._isEStyle && !this._isFStyle) ? 'none' : 'flex',
             margin: {
               top: -26 / 2,
               left: this._buttonIconPos(String(this.text).length) - 26 / 2,
@@ -261,14 +253,16 @@ export class PromptButton extends InPromptUIObject {
         <Label
           {...this.labelElement}
           value={String(this.text)}
-          color={this._disabled ? this._labelDisabledColor : this.labelElement.color || this._labelColor}
+          color={
+            this._disabled ? this._labelDisabledColor : this.labelElement.color || this._labelColor
+          }
         />
       </UiEntity>
     )
   }
 
   private _click = (): void => {
-    if (this._disabled) return
+    if (this._disabled || !this.visible || !this.isPromptVisible) return
 
     console.log('prompt button _click_________________')
 
@@ -281,14 +275,12 @@ export class PromptButton extends InPromptUIObject {
   }
 
   private _createSystemInputAction(): void {
-    if (!this.visible || !this.promptVisible || (!this._isEStyle && !this._isFStyle)) return
+    if (!this.visible || (!this._isEStyle && !this._isFStyle)) return
 
-    this._buttonSystemInputAction = new SystemInputActions(
-      {
-        inputAction: this._isEStyle ? InputAction.IA_PRIMARY : InputAction.IA_SECONDARY,
-        callback: this._click,
-      },
-    )
+    this._buttonSystemInputAction = new SystemInputActions({
+      inputAction: this._isEStyle ? InputAction.IA_PRIMARY : InputAction.IA_SECONDARY,
+      callback: this._click,
+    })
 
     this._buttonSystemInputAction.add()
   }

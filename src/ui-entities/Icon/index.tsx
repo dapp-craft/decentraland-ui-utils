@@ -5,16 +5,21 @@ import { UIObject, UIObjectConfig } from '../UIObject'
 
 import { getImageAtlasMapping, ImageAtlasData } from '../../utils/imageUtils'
 
-type IconSizeType = 'small' | 'medium' | 'large';
+export type IconImageElement = Omit<EntityPropTypes, 'uiTransform' | 'uiBackground'> & {
+  uiTransform?: Omit<
+    NonNullable<EntityPropTypes['uiTransform']>,
+    'display' | 'position' | 'width' | 'height'
+  >
+  uiBackground?: Omit<NonNullable<EntityPropTypes['uiBackground']>, 'texture' | 'uvs'>
+}
 
 export type IconConfig = UIObjectConfig & {
-  image: string;
-  width?: number;
-  height?: number;
-  xOffset?: number;
-  yOffset?: number;
-  size?: IconSizeType;
-  section?: ImageAtlasData;
+  image: string
+  width?: number
+  height?: number
+  xOffset?: number
+  yOffset?: number
+  section?: ImageAtlasData
 }
 
 export type IconInitialConfig = {
@@ -34,7 +39,6 @@ const iconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
   height: 128,
   xOffset: 0,
   yOffset: 0,
-  size: 'large',
 } as const
 
 /**
@@ -46,37 +50,32 @@ const iconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
  * @param {number} [height=128] image height
  * @param {number} [xOffset=0] offset on X
  * @param {number} [yOffset=0] offset on Y
- * @param {IconSizeType} [size='large'] icon size
  * @param {ImageAtlasData} section cut out a section of the image, as an object specifying atlasWidth, atlasHeight, sourceLeft, sourceTop, sourceWidth and sourceHeight
  *
  */
 export class Icon extends UIObject {
-  public imageElement: EntityPropTypes
+  public imageElement: IconImageElement
 
   public image: string
-  public size: IconSizeType
   public width: number
   public height: number
   public xOffset: number
   public yOffset: number
   public section: ImageAtlasData | undefined
 
-  constructor(
-    {
-      initial = iconInitialConfig,
-      startHidden = initial.startHidden,
-      image = initial.image,
-      size = initial.size,
-      width = IconSize[size],
-      height = IconSize[size],
-      xOffset = initial.xOffset,
-      yOffset = initial.yOffset,
-      section,
-    }: IconConfig & IconInitialConfig) {
+  constructor({
+    section,
+    initial = iconInitialConfig,
+    startHidden = initial.startHidden,
+    image = initial.image,
+    width = initial.width,
+    height = initial.height,
+    xOffset = initial.xOffset,
+    yOffset = initial.yOffset,
+  }: IconConfig & IconInitialConfig) {
     super({ startHidden })
 
     this.image = image
-    this.size = size
     this.width = width
     this.height = height
     this.xOffset = xOffset
@@ -120,11 +119,10 @@ export class Icon extends UIObject {
 const smallIconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
   startHidden: true,
   image: '',
-  width: 32,
-  height: 32,
+  width: IconSize.small,
+  height: IconSize.small,
   xOffset: -30,
   yOffset: 50,
-  size: 'large',
 } as const
 
 /**
@@ -141,18 +139,17 @@ const smallIconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
  */
 export class SmallIcon extends Icon {
   constructor(config: IconConfig) {
-    super({ ...config, size: 'small', initial: smallIconInitialConfig })
+    super({ ...config, initial: smallIconInitialConfig })
   }
 }
 
 const mediumIconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
   startHidden: true,
   image: '',
-  width: 64,
-  height: 64,
+  width: IconSize.medium,
+  height: IconSize.medium,
   xOffset: -30,
   yOffset: 50,
-  size: 'large',
 } as const
 
 /**
@@ -169,18 +166,17 @@ const mediumIconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
  */
 export class MediumIcon extends Icon {
   constructor(config: IconConfig) {
-    super({ ...config, size: 'medium', initial: mediumIconInitialConfig })
+    super({ ...config, initial: mediumIconInitialConfig })
   }
 }
 
 const largeIconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
   startHidden: true,
   image: '',
-  width: 128,
-  height: 128,
+  width: IconSize.large,
+  height: IconSize.large,
   xOffset: -30,
   yOffset: 50,
-  size: 'large',
 } as const
 
 /**
@@ -197,6 +193,6 @@ const largeIconInitialConfig: Omit<Required<IconConfig>, 'section'> = {
  */
 export class LargeIcon extends Icon {
   constructor(config: IconConfig) {
-    super({ ...config, size: 'large', initial: largeIconInitialConfig })
+    super({ ...config, initial: largeIconInitialConfig })
   }
 }

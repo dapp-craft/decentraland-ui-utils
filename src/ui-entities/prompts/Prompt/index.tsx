@@ -3,7 +3,11 @@ import { Callback } from '@dcl/react-ecs/dist/components/listeners/types'
 
 import { UIObject, UIObjectConfig } from '../../UIObject'
 
-import { PromptCloseIcon, PromptCloseIconConfig, PromptCloseIconStyles } from './components/CloseIcon'
+import {
+  PromptCloseIcon,
+  PromptCloseIconConfig,
+  PromptCloseIconStyles,
+} from './components/CloseIcon'
 import { PromptText, PromptTextConfig } from './components/Text'
 import { PromptIcon, PromptIconConfig } from './components/Icon'
 import { PromptButton, PromptButtonConfig } from './components/Button'
@@ -14,6 +18,7 @@ import { PromptInput, PromptInputConfig } from './components/Input'
 import { getImageAtlasMapping, ImageAtlasData } from '../../../utils/imageUtils'
 
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../../constants/resources'
+import { IPrompt } from './IPrompt'
 
 export enum PromptStyles {
   LIGHT = `light`,
@@ -21,17 +26,17 @@ export enum PromptStyles {
   LIGHTLARGE = `lightlarge`,
   DARKLARGE = `darklarge`,
   LIGHTSLANTED = `lightslanted`,
-  DARKSLANTED = `darkslanted`
+  DARKSLANTED = `darkslanted`,
 }
 
 export type PromptExternalConfig = UIObjectConfig & {
-  width?: number;
-  height?: number;
-  onClose?: Callback;
+  width?: number
+  height?: number
+  onClose?: Callback
 }
 
 export type PromptConfig = PromptExternalConfig & {
-  style?: PromptStyles;
+  style?: PromptStyles
 }
 
 const promptInitialConfig: Required<PromptConfig> = {
@@ -39,8 +44,7 @@ const promptInitialConfig: Required<PromptConfig> = {
   style: PromptStyles.LIGHT,
   width: 400,
   height: 250,
-  onClose: () => {
-  },
+  onClose: () => {},
 } as const
 
 /**
@@ -52,7 +56,7 @@ const promptInitialConfig: Required<PromptConfig> = {
  * @param {Callback} onClose callback on prompt close
  *
  */
-export class Prompt extends UIObject {
+export class Prompt extends UIObject implements IPrompt {
   public closeIcon: PromptCloseIcon
 
   public style: PromptStyles
@@ -62,18 +66,25 @@ export class Prompt extends UIObject {
 
   private _texture: AtlasTheme
   private _section: ImageAtlasData
-  private _components: (PromptCloseIcon | PromptText | PromptIcon | PromptButton | PromptCheckbox | PromptSwitch | PromptInput)[]
+  private _components: (
+    | PromptCloseIcon
+    | PromptText
+    | PromptIcon
+    | PromptButton
+    | PromptCheckbox
+    | PromptSwitch
+    | PromptInput
+  )[]
   private readonly _closeIconData: PromptCloseIconConfig
   public readonly isDarkTheme: boolean
 
-  constructor(
-    {
-      startHidden = promptInitialConfig.startHidden,
-      style = promptInitialConfig.style,
-      width,
-      height,
-      onClose = promptInitialConfig.onClose,
-    }: PromptConfig | undefined = {}) {
+  constructor({
+    startHidden = promptInitialConfig.startHidden,
+    style = promptInitialConfig.style,
+    width,
+    height,
+    onClose = promptInitialConfig.onClose,
+  }: PromptConfig | undefined = {}) {
     super({ startHidden })
 
     this.style = style
@@ -90,14 +101,11 @@ export class Prompt extends UIObject {
     }
 
     this._closeIconData = {
-      promptVisible: this.visible,
       width: 32,
       height: 32,
       style: PromptCloseIconStyles.CLOSED,
-      darkTheme: false,
       onMouseDown: this._close,
-      promptWidth: this._getWidth(),
-      promptHeight: this._getHeight(),
+      parent: this,
     }
 
     this._setStyle()
@@ -109,25 +117,7 @@ export class Prompt extends UIObject {
     this._components = [this.closeIcon]
   }
 
-  public show() {
-    super.show()
-
-    this._components.forEach((component) => {
-      component.changedPromptVisible(true)
-      component.show()
-    })
-  }
-
-  public hide() {
-    super.hide()
-
-    this._components.forEach((component) => {
-      component.changedPromptVisible(false)
-      component.hide()
-    })
-  }
-
-  public addTextBox(config: Omit<PromptInputConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptInput {
+  public addTextBox(config: Omit<PromptInputConfig, 'parent'>): PromptInput {
     const uiInput = new PromptInput({
       ...config,
       ...this._getPromptComponentCustomConfig(),
@@ -138,59 +128,51 @@ export class Prompt extends UIObject {
     return uiInput
   }
 
-  public addSwitch(config: Omit<PromptSwitchConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptSwitch {
-    const uiSwitch = new PromptSwitch(
-      {
-        ...config,
-        ...this._getPromptComponentCustomConfig(),
-      },
-    )
+  public addSwitch(config: Omit<PromptSwitchConfig, 'parent'>): PromptSwitch {
+    const uiSwitch = new PromptSwitch({
+      ...config,
+      ...this._getPromptComponentCustomConfig(),
+    })
 
     this._components.push(uiSwitch)
 
     return uiSwitch
   }
 
-  public addCheckbox(config: Omit<PromptCheckboxConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptCheckbox {
-    const uiCheckbox = new PromptCheckbox(
-      {
-        ...config,
-        ...this._getPromptComponentCustomConfig(),
-      },
-    )
+  public addCheckbox(config: Omit<PromptCheckboxConfig, 'parent'>): PromptCheckbox {
+    const uiCheckbox = new PromptCheckbox({
+      ...config,
+      ...this._getPromptComponentCustomConfig(),
+    })
 
     this._components.push(uiCheckbox)
 
     return uiCheckbox
   }
 
-  public addButton(config: Omit<PromptButtonConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptButton {
-    const uiButton = new PromptButton(
-      {
-        ...config,
-        ...this._getPromptComponentCustomConfig(),
-      },
-    )
+  public addButton(config: Omit<PromptButtonConfig, 'parent'>): PromptButton {
+    const uiButton = new PromptButton({
+      ...config,
+      ...this._getPromptComponentCustomConfig(),
+    })
 
     this._components.push(uiButton)
 
     return uiButton
   }
 
-  public addText(config: Omit<PromptTextConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptText {
-    const uiText = new PromptText(
-      {
-        ...config,
-        ...this._getPromptComponentCustomConfig(),
-      },
-    )
+  public addText(config: Omit<PromptTextConfig, 'parent'>): PromptText {
+    const uiText = new PromptText({
+      ...config,
+      ...this._getPromptComponentCustomConfig(),
+    })
 
     this._components.push(uiText)
 
     return uiText
   }
 
-  public addIcon(config: Omit<PromptIconConfig, 'darkTheme' | 'promptWidth' | 'promptHeight' | 'promptVisible'>): PromptIcon {
+  public addIcon(config: Omit<PromptIconConfig, 'parent'>): PromptIcon {
     const uiIcon = new PromptIcon({
       ...config,
       ...this._getPromptComponentCustomConfig(),
@@ -202,14 +184,8 @@ export class Prompt extends UIObject {
   }
 
   public render(key?: string): ReactEcs.JSX.Element {
-    const width = this._getWidth()
-    const height = this._getHeight()
-
-    this._components.forEach((component) => {
-      component.promptWidth = this._getWidth()
-      component.promptHeight = this._getHeight()
-      component.darkTheme = this.isDarkTheme
-    })
+    const width = this.realWidth()
+    const height = this.realHeight()
 
     return (
       <UiEntity
@@ -241,29 +217,23 @@ export class Prompt extends UIObject {
             uvs: getImageAtlasMapping(this._section),
           }}
         />
-        {
-          this._components.map((component, idx) => (
-            component.render(`prompt-component-${idx}`)
-          ))
-        }
+        {this.visible &&
+          this._components.map((component, idx) => component.render(`prompt-component-${idx}`))}
       </UiEntity>
     )
   }
 
   private _getPromptComponentCustomConfig() {
     return {
-      promptVisible: this.visible,
-      darkTheme: this.isDarkTheme,
-      promptWidth: this._getWidth(),
-      promptHeight: this._getHeight(),
+      parent: this,
     }
   }
 
-  private _getWidth(): number {
+  public realWidth(): number {
     return this.width ? this.width : this._section.sourceWidth
   }
 
-  private _getHeight(): number {
+  public realHeight(): number {
     return this.height ? this.height : this._section.sourceHeight
   }
 

@@ -8,33 +8,39 @@ import { getImageAtlasMapping } from '../../../../../utils/imageUtils'
 
 import { AtlasTheme, sourcesComponentsCoordinates } from '../../../../../constants/resources'
 
+export type PromptCloseIconIconElementProps = Omit<
+  EntityPropTypes,
+  'uiTransform' | 'uiBackground'
+> & {
+  uiTransform?: Omit<
+    NonNullable<EntityPropTypes['uiTransform']>,
+    'width' | 'height' | 'position' | 'display'
+  >
+  uiBackground?: Omit<NonNullable<EntityPropTypes['uiBackground']>, 'uvs'>
+}
+
 export enum PromptCloseIconStyles {
   CLOSEW = `closeW`,
   CLOSED = `closeD`,
 }
 
 export type PromptCloseIconConfig = InPromptUIObjectConfig & {
-  style: PromptCloseIconStyles;
-  width?: number;
-  height?: number;
-  xPosition?: number;
-  yPosition?: number;
-  onMouseDown: Callback;
+  style: PromptCloseIconStyles
+  width?: number
+  height?: number
+  xPosition?: number
+  yPosition?: number
+  onMouseDown: Callback
 }
 
-const promptCloseIconInitialConfig: Required<PromptCloseIconConfig> = {
+const promptCloseIconInitialConfig: Omit<Required<PromptCloseIconConfig>, 'parent'> = {
   startHidden: false,
   style: PromptCloseIconStyles.CLOSED,
   width: 32,
   height: 32,
   xPosition: 10,
   yPosition: 10,
-  onMouseDown: () => {
-  },
-  promptVisible: false,
-  promptWidth: 400,
-  promptHeight: 250,
-  darkTheme: false,
+  onMouseDown: () => {},
 } as const
 
 /**
@@ -49,7 +55,7 @@ const promptCloseIconInitialConfig: Required<PromptCloseIconConfig> = {
  *
  */
 export class PromptCloseIcon extends InPromptUIObject {
-  public iconElement: EntityPropTypes
+  public iconElement: PromptCloseIconIconElementProps
 
   public style: PromptCloseIconStyles
   public width: number
@@ -58,21 +64,20 @@ export class PromptCloseIcon extends InPromptUIObject {
   public yPosition: number
   public onMouseDown: Callback
 
-  constructor(
-    {
-      startHidden = promptCloseIconInitialConfig.startHidden,
-      style = promptCloseIconInitialConfig.style,
-      width = sourcesComponentsCoordinates.icons[style].sourceWidth,
-      height = sourcesComponentsCoordinates.icons[style].sourceHeight,
-      xPosition = promptCloseIconInitialConfig.xPosition,
-      yPosition = promptCloseIconInitialConfig.yPosition,
-      onMouseDown = promptCloseIconInitialConfig.onMouseDown,
-      promptVisible = promptCloseIconInitialConfig.promptVisible,
-      promptWidth,
-      promptHeight,
-      darkTheme,
-    }: PromptCloseIconConfig) {
-    super({ startHidden: startHidden || !promptVisible, promptVisible, promptWidth, promptHeight, darkTheme })
+  constructor({
+    parent,
+    startHidden = promptCloseIconInitialConfig.startHidden,
+    style = promptCloseIconInitialConfig.style,
+    width = sourcesComponentsCoordinates.icons[style].sourceWidth,
+    height = sourcesComponentsCoordinates.icons[style].sourceHeight,
+    xPosition = promptCloseIconInitialConfig.xPosition,
+    yPosition = promptCloseIconInitialConfig.yPosition,
+    onMouseDown = promptCloseIconInitialConfig.onMouseDown,
+  }: PromptCloseIconConfig) {
+    super({
+      startHidden,
+      parent,
+    })
 
     this.onMouseDown = onMouseDown
 
@@ -110,7 +115,7 @@ export class PromptCloseIcon extends InPromptUIObject {
         }}
         uiTransform={{
           ...this.iconElement.uiTransform,
-          display: (this.visible && this.promptVisible) ? 'flex' : 'none',
+          display: this.visible ? 'flex' : 'none',
           width: this.width,
           height: this.height,
           position: { top: this.yPosition, right: this.xPosition },
