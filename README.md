@@ -46,6 +46,16 @@ Make sure you've [installed the Decentraland editor](https://docs.decentraland.o
 4) Visual Studio opens an input box at the top of the screen. Write `@dcl/ui-scene-utils` and hit enter. The dependency is then installed to your scene.
 
 
+4) Import the library into the scene's script. Add this line at the start of your `index.ts` file, or any other TypeScript files that require it:
+
+```ts
+import * as ui from '@dcl/ui-scene-utils'
+```
+
+5) In your TypeScript file, write `ui.` and let the suggestions of your IDE show the available helpers.
+
+
+
 ### Via the CLI
 
 1. Install it as an `npm` package. Run this command in your scene's project folder:
