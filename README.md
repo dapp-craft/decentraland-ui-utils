@@ -31,8 +31,6 @@ A collection of tools for common UI requirements for Decentraland scenes.
 
 To use any of the helpers provided by the utils library you must install it in your Decentrland project.
 
-To use any of the helpers provided by the utils library you must install it in your Decentrland project.
-
 ### Via the Decentraland Editor
 
 Make sure you've [installed the Decentraland editor](https://docs.decentraland.org/creator/development-guide/sdk7/installation-guide/#the-decentraland-editor).
@@ -58,7 +56,7 @@ npm install @dcl/ui-scene-utils
 
 2. Run `npm run start` or `npm run build` so the dependencies are correctly installed.
 
-3. Import the library into the scene's script. Add this line at the start of your `game.ts` file, or any other TypeScript files that require it:
+3. Import the library into the scene's script. Add this line at the start of your `index.ts` file, or any other TypeScript files that require it:
 
 ```ts
 import * as ui from '@dcl/ui-scene-utils'
